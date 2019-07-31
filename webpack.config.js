@@ -1,9 +1,10 @@
 var path = require('path');
 
 module.exports = {
-  entry: [
-    __dirname + '/scripts/bin/client.js'
-  ],
+  entry: {
+    'kin-sdk-client': __dirname + '/scripts/bin/client.js',
+    'client-app': __dirname + '/scripts/bin/client-app.js'
+  },
   devtool: 'source-map',
   module: {
     rules: [{
