@@ -3,10 +3,13 @@ import {Asset, Keypair, Network, Operation, Server, Transaction as XdrTransactio
 import {KeyPair} from "./keyPair";
 import {TransactionBuilder} from "./transactionBuilder";
 import {ErrorDecoder, HorizonError, NetworkError, NetworkMismatchedError} from "../errors";
-import {Channel} from "./channelsPool";
 import {IBlockchainInfoRetriever} from "./blockchainInfoRetriever";
 import {CHANNEL_TOP_UP_TX_COUNT} from "../config";
 import {TransactionErrorList} from "./errors";
+import KeystoreProvider from "../keystoreProviders/keystoreProviderInterface";
+import { Transaction as TransactionInterface, Channel }  from "..";
+import { Transaction } from '@kinecosystem/kin-sdk';
+import { DecodeTransactionParams } from "./horizonModels";
 
 interface WhitelistPayloadTemp {
 	// The android stellar sdk spells 'envelope' as 'envelop'
@@ -16,11 +19,11 @@ interface WhitelistPayloadTemp {
 }
 
 export class TxSender {
-	constructor(private readonly _keypair: KeyPair,
+	constructor(private readonly _keystoreProvider: KeystoreProvider,
 				private readonly _appId: string,
 				private readonly _server: Server,
 				private readonly _blockchainInfoRetriever: IBlockchainInfoRetriever) {
-		this._keypair = _keypair;
+		this._keystoreProvider = _keystoreProvider;
 		this._appId = _appId;
 		this._server = _server;
 		this._blockchainInfoRetriever = _blockchainInfoRetriever;
@@ -42,7 +45,7 @@ export class TxSender {
 			builder.addTextMemo(memo);
 		}
 		builder.addOperation(Operation.createAccount({
-			source: this._keypair.publicAddress,
+			source: this._keystoreProvider.publicAddress,
 			destination: address,
 			startingBalance: startingBalance.toString()
 		}));
@@ -55,7 +58,7 @@ export class TxSender {
 			builder.addTextMemo(memo);
 		}
 		builder.addOperation(Operation.payment({
-			source: this._keypair.publicAddress,
+			source: this._keystoreProvider.publicAddress,
 			destination: address,
 			asset: Asset.native(),
 			amount: amount.toString()
@@ -66,13 +69,18 @@ export class TxSender {
 	public async submitTransaction(builder: TransactionBuilder): Promise<TransactionId> {
 		try {
 			const tx = builder.build();
-			const signers = new Array<Keypair>();
-			signers.push(Keypair.fromSecret(this._keypair.seed));
-			if (builder.channel) {
-				signers.push(Keypair.fromSecret(builder.channel.keyPair.seed));
-			}
-			tx.sign(...signers);
-			const transactionResponse = await this._server.submitTransaction(tx);
+			const signedTxEnvelope = this._keystoreProvider.signTransaction(tx.toEnvelope().toXDR().toString());
+			const signedTx = new Transaction(signedTxEnvelope);
+			/**
+			 * This code is needs to be implemented by the keystoreProvider
+			 */
+			// const signers = new Array<Keypair>();
+			// signers.push(Keypair.fromSecret(this._keypair.seed));
+			// if (builder.channel) {
+			// 	signers.push(Keypair.fromSecret(builder.channel.keyPair.seed));
+			// }
+			// tx.sign(...signers);
+			const transactionResponse = await this._server.submitTransaction(signedTx);
 			return transactionResponse.hash;
 		} catch (e) {
 			const error = ErrorDecoder.translate(e);
@@ -87,36 +95,36 @@ export class TxSender {
 		}
 	}
 
-	public whitelistTransaction(payload: string | WhitelistPayload): string {
-		let txPair: WhitelistPayload | WhitelistPayloadTemp;
-		if (typeof payload === "string") {
-			const tx = JSON.parse(payload);
-			if (tx.envelop != null) {
-				txPair = tx as WhitelistPayloadTemp;
-				txPair.envelope = txPair.envelop;
-			} else {
-				txPair = tx as WhitelistPayload;
-			}
-		} else {
-			txPair = payload;
-		}
+	// public whitelistTransaction(payload: string | WhitelistPayload): string {
+	// 	let txPair: WhitelistPayload | WhitelistPayloadTemp;
+	// 	if (typeof payload === "string") {
+	// 		const tx = JSON.parse(payload);
+	// 		if (tx.envelop != null) {
+	// 			txPair = tx as WhitelistPayloadTemp;
+	// 			txPair.envelope = txPair.envelop;
+	// 		} else {
+	// 			txPair = tx as WhitelistPayload;
+	// 		}
+	// 	} else {
+	// 		txPair = payload;
+	// 	}
 
-		if (typeof txPair.envelope !== "string") {
-			throw new TypeError("'envelope' must be type of string");
-		}
+	// 	if (typeof txPair.envelope !== "string") {
+	// 		throw new TypeError("'envelope' must be type of string");
+	// 	}
 
-		const networkPassphrase = Network.current().networkPassphrase();
-		if (networkPassphrase !== txPair.networkId) {
-			throw new NetworkMismatchedError("Unable to sign whitelist transaction, network type is mismatched");
-		}
+	// 	const networkPassphrase = Network.current().networkPassphrase();
+	// 	if (networkPassphrase !== txPair.networkId) {
+	// 		throw new NetworkMismatchedError("Unable to sign whitelist transaction, network type is mismatched");
+	// 	}
 
-		const transaction = new XdrTransaction(txPair.envelope);
-		transaction.sign(Keypair.fromSecret(this._keypair.seed));
-		const envelope = transaction.toEnvelope();
-		const buffer = envelope.toXDR("base64");
+	// 	const transaction = new XdrTransaction(txPair.envelope);
+	// 	transaction.sign(Keypair.fromSecret(this._keypair.seed));
+	// 	const envelope = transaction.toEnvelope();
+	// 	const buffer = envelope.toXDR("base64");
 
-		return buffer.toString();
-	}
+	// 	return buffer.toString();
+	// }
 
 	private checkForInsufficientChannelFeeBalance(builder: TransactionBuilder, error: HorizonError | NetworkError): boolean {
 		if (!builder.channel) {
@@ -126,15 +134,15 @@ export class TxSender {
 	}
 
 	private async topUpChannel(builder: TransactionBuilder) {
-		const channel = builder.channel as Channel;
-		const fee = await this._blockchainInfoRetriever.getMinimumFee();
-		const amount = fee * CHANNEL_TOP_UP_TX_COUNT;
-		const topUpBuilder = await this.buildSendKin(channel.keyPair.publicAddress, amount, fee);
-		await this.submitTransaction(topUpBuilder);
+		// const channel = builder.channel as Channel;
+		// const fee = await this._blockchainInfoRetriever.getMinimumFee();
+		// const amount = fee * CHANNEL_TOP_UP_TX_COUNT;
+		// const topUpBuilder = await this.buildSendKin(channel.keyPair.publicAddress, amount, fee);
+		// await this.submitTransaction(topUpBuilder);
 	}
 
 	private async loadSenderAccountData(channel?: Channel) {
-		const addressToLoad = channel ? channel.keyPair.publicAddress : this._keypair.publicAddress;
+		const addressToLoad = channel ? channel.keyPair.publicAddress : this._keystoreProvider.publicAddress;
 		const response: Server.AccountResponse = await this._server.loadAccount(addressToLoad);
 		return response;
 	}

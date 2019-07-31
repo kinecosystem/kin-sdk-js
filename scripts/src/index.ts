@@ -20,7 +20,6 @@ import {
 	Transaction
 } from "./blockchain/horizonModels";
 import {KeyPair} from "./blockchain/keyPair";
-import {Channels, CreateChannelsParams, GenerateSeedsParams} from "./blockchain/channelsGenerator";
 import {Channel, ChannelsPool, ChannelsPoolStatus, ChannelState} from "./blockchain/channelsPool";
 import {
 	AccountExistsError,
@@ -57,9 +56,6 @@ export {
 	Balance,
 	TransactionId,
 	KeyPair,
-	Channels,
-	CreateChannelsParams,
-	GenerateSeedsParams,
 	CreateKinAccountParams,
 	TransactionHistoryParams,
 	PaymentListenerParams,

@@ -1,5 +1,6 @@
 import {Environment} from "./environment";
 import {KinAccount} from "./kinAccount";
+import KeystoreProvider  from "./keystoreProviders/keystoreProviderInterface"
 import {
 	AccountData,
 	Balance,
@@ -25,8 +26,9 @@ export class KinClient {
 	private readonly _blockchainInfoRetriever: BlockchainInfoRetriever;
 	private readonly _transactionRetriever: TransactionRetriever;
 	private readonly _blockchainListener: BlockchainListener;
+	private readonly _kinAccount: KinAccount;
 
-	constructor(private readonly _environment: Environment) {
+	constructor(private readonly _environment: Environment, private readonly _keystoreProvider: KeystoreProvider, private readonly _appId?: string) {
 		this._environment = _environment;
 		this._server = new Server(_environment.url, { allowHttp: false, headers: GLOBAL_HEADERS, retry: GLOBAL_RETRY });
 		Network.use(new Network(_environment.passphrase));
@@ -35,16 +37,22 @@ export class KinClient {
 		this._blockchainInfoRetriever = new BlockchainInfoRetriever(this._server);
 		this._transactionRetriever = new TransactionRetriever(this._server);
 		this._blockchainListener = new BlockchainListener(this._server);
+		this._kinAccount = new KinAccount(_keystoreProvider, this._accountDataRetriever, this._server, this._blockchainInfoRetriever,
+			_appId ?_appId : ANON_APP_ID);
+	}
+
+	get kinAccount() {
+		return this._kinAccount;
 	}
 
 	get environment() {
 		return this._environment;
 	}
 
-	public createKinAccount(params: CreateKinAccountParams): KinAccount {
-		return new KinAccount(params.seed, this._accountDataRetriever, this._server, this._blockchainInfoRetriever,
-			params.appId ? params.appId : ANON_APP_ID, params.channelSecretKeys);
-	}
+	// public createKinAccount(params: CreateKinAccountParams): KinAccount {
+	// 	return new KinAccount(params.seed, this._accountDataRetriever, this._server, this._blockchainInfoRetriever,
+	// 		params.appId ? params.appId : ANON_APP_ID, params.channelSecretKeys);
+	// }
 
 	/**
 	 * Get the current minimum fee that the network charges per operation.
@@ -58,16 +66,16 @@ export class KinClient {
 	 * Get the current confirmed balance in kin from kin blockchain.
 	 * @param address wallet address (public key)
 	 */
-	public async getAccountBalance(address: Address): Promise<Balance> {
-		return await this._accountDataRetriever.fetchKinBalance(address);
+	public async getAccountBalance(): Promise<Balance> {
+		return await this._accountDataRetriever.fetchKinBalance(this._kinAccount.publicAddress);
 	}
 
 	/**
 	 * Check if the account exists on kin blockchain.
 	 * @param address wallet address (public key)
 	 */
-	public async isAccountExisting(address: Address): Promise<boolean> {
-		return await this._accountDataRetriever.isAccountExisting(address);
+	public async isAccountExisting(): Promise<boolean> {
+		return await this._accountDataRetriever.isAccountExisting(this._kinAccount.publicAddress);
 	}
 
 	/**
@@ -75,8 +83,8 @@ export class KinClient {
 	 * @param address wallet address (public key)
 	 * @returns an AccountData represent account details
 	 */
-	public async getAccountData(address: Address): Promise<AccountData> {
-		return await this._accountDataRetriever.fetchAccountData(address);
+	public async getAccountData(): Promise<AccountData> {
+		return await this._accountDataRetriever.fetchAccountData(this._kinAccount.publicAddress);
 	}
 
 	/**
