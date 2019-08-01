@@ -67,7 +67,7 @@ export class KinClient {
 	 * @param address wallet address (public key)
 	 */
 	public async getAccountBalance(): Promise<Balance> {
-		return await this._accountDataRetriever.fetchKinBalance(this._kinAccount.publicAddress);
+		return await this._accountDataRetriever.fetchKinBalance(await this._kinAccount.publicAddress);
 	}
 
 	/**
@@ -75,7 +75,7 @@ export class KinClient {
 	 * @param address wallet address (public key)
 	 */
 	public async isAccountExisting(): Promise<boolean> {
-		return await this._accountDataRetriever.isAccountExisting(this._kinAccount.publicAddress);
+		return await this._accountDataRetriever.isAccountExisting(await this._kinAccount.publicAddress);
 	}
 
 	/**
@@ -84,7 +84,7 @@ export class KinClient {
 	 * @returns an AccountData represent account details
 	 */
 	public async getAccountData(): Promise<AccountData> {
-		return await this._accountDataRetriever.fetchAccountData(this._kinAccount.publicAddress);
+		return await this._accountDataRetriever.fetchAccountData(await this._kinAccount.publicAddress);
 	}
 
 	/**

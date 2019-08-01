@@ -12,7 +12,6 @@ import KeystoreProvider from "./keystoreProviders/keystoreProviderInterface";
 
 export class KinAccount {
 	private readonly _txSender: TxSender;
-	private readonly _publicAddress: string;
 	private readonly _channelsPool?: ChannelsPool;
 
 	constructor(private readonly _keystoreProvider: KeystoreProvider,
@@ -24,12 +23,11 @@ export class KinAccount {
 		if (_channelSecretKeys) {
 			this._channelsPool = new ChannelsPool(_channelSecretKeys);
 		}
-		this._publicAddress = this._keystoreProvider.publicAddress;
 		this._txSender = new TxSender(_keystoreProvider, this._appId, server, blockchainInfoRetriever);
 	}
 
-	get publicAddress(): Address {
-		return this._publicAddress;
+	 get publicAddress(): Promise<Address> {
+		return this._keystoreProvider.publicAddress;
 	}
 
 	get appId(): string {
@@ -41,11 +39,11 @@ export class KinAccount {
 	}
 
 	public async getBalance(): Promise<Balance> {
-		return await this._accountDataRetriever.fetchKinBalance(this.publicAddress);
+		return await this._accountDataRetriever.fetchKinBalance(await this.publicAddress);
 	}
 
 	async getData(): Promise<AccountData> {
-		return await this._accountDataRetriever.fetchAccountData(this.publicAddress);
+		return await this._accountDataRetriever.fetchAccountData(await this.publicAddress);
 	}
 
 	public async getTransactionBuilder(param: GetTransactionParams): Promise<TransactionBuilder> {

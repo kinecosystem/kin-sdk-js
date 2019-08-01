@@ -1,5 +1,5 @@
 import {Address, TransactionId, WhitelistPayload} from "../types";
-import {Asset, Keypair, Network, Operation, Server, Transaction as XdrTransaction} from "@kinecosystem/kin-sdk";
+import {Asset, Keypair, Network, Operation, Server} from "@kinecosystem/kin-sdk";
 import {KeyPair} from "./keyPair";
 import {TransactionBuilder} from "./transactionBuilder";
 import {ErrorDecoder, HorizonError, NetworkError, NetworkMismatchedError} from "../errors";
@@ -7,8 +7,8 @@ import {IBlockchainInfoRetriever} from "./blockchainInfoRetriever";
 import {CHANNEL_TOP_UP_TX_COUNT} from "../config";
 import {TransactionErrorList} from "./errors";
 import KeystoreProvider from "../keystoreProviders/keystoreProviderInterface";
-import { Transaction as TransactionInterface, Channel }  from "..";
-import { Transaction } from '@kinecosystem/kin-sdk';
+import { Transaction as TransactionInterface, Channel } from "..";
+import { Transaction } from "@kinecosystem/kin-sdk";
 import { DecodeTransactionParams } from "./horizonModels";
 
 interface WhitelistPayloadTemp {
@@ -20,9 +20,9 @@ interface WhitelistPayloadTemp {
 
 export class TxSender {
 	constructor(private readonly _keystoreProvider: KeystoreProvider,
-				private readonly _appId: string,
-				private readonly _server: Server,
-				private readonly _blockchainInfoRetriever: IBlockchainInfoRetriever) {
+				         private readonly _appId: string,
+				         private readonly _server: Server,
+				         private readonly _blockchainInfoRetriever: IBlockchainInfoRetriever) {
 		this._keystoreProvider = _keystoreProvider;
 		this._appId = _appId;
 		this._server = _server;
@@ -45,7 +45,7 @@ export class TxSender {
 			builder.addTextMemo(memo);
 		}
 		builder.addOperation(Operation.createAccount({
-			source: this._keystoreProvider.publicAddress,
+			source: await this._keystoreProvider.publicAddress,
 			destination: address,
 			startingBalance: startingBalance.toString()
 		}));
@@ -58,7 +58,7 @@ export class TxSender {
 			builder.addTextMemo(memo);
 		}
 		builder.addOperation(Operation.payment({
-			source: this._keystoreProvider.publicAddress,
+			source: await this._keystoreProvider.publicAddress,
 			destination: address,
 			asset: Asset.native(),
 			amount: amount.toString()
@@ -68,9 +68,10 @@ export class TxSender {
 
 	public async submitTransaction(builder: TransactionBuilder): Promise<TransactionId> {
 		try {
-			const tx = builder.build();
-			const signedTxEnvelope = this._keystoreProvider.signTransaction(tx.toEnvelope().toXDR().toString());
-			const signedTx = new Transaction(signedTxEnvelope);
+			const xdrTransaction = builder.build();
+			console.log("submitTransaction::submitTransaction::xdrTransaction");
+			console.log(xdrTransaction);
+			const signedXdrTransaction = await this._keystoreProvider.signTransaction(xdrTransaction);
 			/**
 			 * This code is needs to be implemented by the keystoreProvider
 			 */
@@ -80,7 +81,7 @@ export class TxSender {
 			// 	signers.push(Keypair.fromSecret(builder.channel.keyPair.seed));
 			// }
 			// tx.sign(...signers);
-			const transactionResponse = await this._server.submitTransaction(signedTx);
+			const transactionResponse = await this._server.submitTransaction(signedXdrTransaction);
 			return transactionResponse.hash;
 		} catch (e) {
 			const error = ErrorDecoder.translate(e);
@@ -142,7 +143,7 @@ export class TxSender {
 	}
 
 	private async loadSenderAccountData(channel?: Channel) {
-		const addressToLoad = channel ? channel.keyPair.publicAddress : this._keystoreProvider.publicAddress;
+		const addressToLoad = channel ? channel.keyPair.publicAddress : await this._keystoreProvider.publicAddress;
 		const response: Server.AccountResponse = await this._server.loadAccount(addressToLoad);
 		return response;
 	}

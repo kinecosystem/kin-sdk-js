@@ -1,23 +1,25 @@
-var path = require('path');
+var path = require("path");
 
 module.exports = {
   entry: {
-    'kin-sdk-client': __dirname + '/scripts/bin/client.js',
-    'client-app': __dirname + '/scripts/bin/client-app.js'
+    "kin-sdk-client": __dirname + "/scripts/src/client.ts",
+    "client-app": __dirname + "/scripts/src/client-app.ts"
   },
-  devtool: 'source-map',
+  devtool: "source-map",
   module: {
-    rules: [{
-      test: /\.ts$/,
-      use: 'ts-loader',
-      exclude: /node_modules/
-    }]
+    rules: [
+      {
+        test: /\.ts$/,
+        use: "ts-loader",
+        exclude: /node_modules/
+      }
+    ]
   },
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: [".ts", ".js"]
   },
   output: {
-    filename: './[name].bundle.js',
-    path: path.resolve(__dirname, 'public')
+    filename: "./[name].bundle.js",
+    path: path.resolve(__dirname, "public")
   }
-}
+};
