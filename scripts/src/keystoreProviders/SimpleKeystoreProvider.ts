@@ -2,24 +2,31 @@ import * as BaseSdk from "@kinecosystem/kin-sdk";
 import KeystoreProvider from "../keystoreProviders/keystoreProviderInterface";
 import { Address } from "../types";
 import { KeyPair } from "..";
-import { Keypair } from "@kinecosystem/kin-sdk";
+import { Keypair, Transaction } from "@kinecosystem/kin-sdk";
 
 export default class SimpleKeystoreProvider implements KeystoreProvider {
-  private readonly _keypair: KeyPair;
+	private readonly _keypair: KeyPair;
 
-  constructor(private readonly _seed: string) {
-    this._keypair = KeyPair.fromSeed(_seed);
-  }
+	constructor(private readonly _seed?: string) {
+		this._keypair =
+			_seed !== undefined ? KeyPair.fromSeed(_seed) : KeyPair.generate();
+	}
 
-  public get publicAddress(): Address {
-    return this._keypair.publicAddress;
-  }
+	public get publicAddress(): Promise<Address> {
+		return new Promise(resolve => {
+			resolve(this._keypair.publicAddress);
+		});
+	}
 
-  public signTransaction(transactionEnvelope: string): string {
-    const tx = new BaseSdk.Transaction(transactionEnvelope);
-    const signers = new Array<Keypair>();
-    signers.push(Keypair.fromSecret(this._keypair.seed));
-    tx.sign(...signers);
-    return tx.toEnvelope().toXDR().toString();
-  }
+	public signTransaction(xdrTransaction: Transaction): Promise<Transaction> {
+		return new Promise(resolve => {
+			const signers = new Array<Keypair>();
+			signers.push(Keypair.fromSecret(this._keypair.seed));
+			xdrTransaction.sign(...signers);
+
+			console.log("SimpleKeystoreProvider::signTransaction");
+			console.log(xdrTransaction);
+			resolve(xdrTransaction);
+		});
+	}
 }

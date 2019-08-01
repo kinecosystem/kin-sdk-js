@@ -6,5 +6,5 @@ declare global{
     }
 }
 
-window.KinSdk = KinSdk
+window.KinSdk = KinSdk;
 export default KinSdk;
