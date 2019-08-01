@@ -1,4 +1,4 @@
-import {KeyPair, KinClient, Environment} from "../../scripts/src";
+import { KinClient, Environment} from "../../scripts/src";
 import SimpleKeystoreProvider from "../../scripts/src/keystoreProviders/SimpleKeystoreProvider";
 
 let senderClient: KinClient;

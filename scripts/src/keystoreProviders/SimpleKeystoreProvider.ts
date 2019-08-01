@@ -1,4 +1,3 @@
-import * as BaseSdk from "@kinecosystem/kin-sdk";
 import KeystoreProvider from "../keystoreProviders/keystoreProviderInterface";
 import { Address } from "../types";
 import { KeyPair } from "..";
