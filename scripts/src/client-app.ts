@@ -1,22 +1,26 @@
-/// <reference path ="./client.ts"/>
-
 import SimpleKeystoreProvider from "./keystoreProviders/SimpleKeystoreProvider";
-import { Keypair } from "@kinecosystem/kin-sdk";
-import { KeyPair, KinClient, Environment } from ".";
 
-const KinSdk = window.KinSdk;
-let senderClient: KinClient;
-let receiverClient: KinClient;
-let senderKeystoreProvider: SimpleKeystoreProvider;
-let receiverKeystoreProvider: SimpleKeystoreProvider;
+declare global {
+	interface Window {
+		KinSdk: any;
+	}
+}
 
 (async function() {
+	let senderClient;
+	let receiverClient;
+	let senderKeystoreProvider;
+	let receiverKeystoreProvider;
+
 	senderKeystoreProvider = new SimpleKeystoreProvider();
 	receiverKeystoreProvider = new SimpleKeystoreProvider();
 
-	senderClient = new KinClient(Environment.Testnet, senderKeystoreProvider);
-	receiverClient = new KinClient(
-		Environment.Testnet,
+	senderClient = new window.KinSdk.KinClient(
+		window.KinSdk.Environment.Testnet,
+		senderKeystoreProvider
+	);
+	receiverClient = new window.KinSdk.KinClient(
+		window.KinSdk.Environment.Testnet,
 		receiverKeystoreProvider
 	);
 
