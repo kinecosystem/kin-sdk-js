@@ -7,42 +7,37 @@ declare global {
 }
 
 (async function() {
-	let senderClient;
-	let receiverClient;
-	let senderKeystoreProvider;
-	let receiverKeystoreProvider;
+	let kinClient;
+	let keyStoreProvider;
 
-	senderKeystoreProvider = new SimpleKeystoreProvider();
-	receiverKeystoreProvider = new SimpleKeystoreProvider();
+	keyStoreProvider = new SimpleKeystoreProvider();
 
-	senderClient = new window.KinSdk.KinClient(
+	kinClient = new window.KinSdk.KinClient(
 		window.KinSdk.Environment.Testnet,
-		senderKeystoreProvider
+		keyStoreProvider
 	);
-	receiverClient = new window.KinSdk.KinClient(
-		window.KinSdk.Environment.Testnet,
-		receiverKeystoreProvider
-	);
+	
+	const accounts = await kinClient.kinAccounts 
 
-	const transactionId = await senderClient.friendbot({
-		address: await senderKeystoreProvider.publicAddress,
+	const transactionId = await kinClient.friendbot({
+		address: accounts[0].publicAddress,
 		amount: 10000,
 	});
-	const secondTransactionId = await receiverClient.friendbot({
-		address: await receiverKeystoreProvider.publicAddress,
+	const secondTransactionId = await kinClient.friendbot({
+		address:  accounts[1].publicAddress,
 		amount: 10000,
 	});
 
-	const txBuilder = await senderClient.kinAccount.buildSendKin({
-		address: await receiverKeystoreProvider.publicAddress,
+	const txBuilder = await accounts[0].buildSendKin({
+		address: accounts[1].publicAddress,
 		amount: 1,
 		fee: 100,
 		memoText: "Send some kin",
 	});
 
-	await senderClient.kinAccount.submitTransaction(txBuilder);
-	const senderBalance = await senderClient.getAccountBalance();
-	const receiverBalance = await receiverClient.getAccountBalance();
+	await accounts[0].submitTransaction(txBuilder);
+	const senderBalance = accounts[0].getBalance();
+	const receiverBalance = accounts[1].getBalance();
 
 	console.log(senderBalance);
 	console.log(receiverBalance);

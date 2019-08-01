@@ -1,35 +1,32 @@
 import { KinClient, Environment} from "../../scripts/src";
 import SimpleKeystoreProvider from "../../scripts/src/keystoreProviders/SimpleKeystoreProvider";
 
-let senderClient: KinClient;
-let receiverClient: KinClient;
-let senderKeystoreProvider: SimpleKeystoreProvider;
-let receiverKeystoreProvider: SimpleKeystoreProvider;
+let kinClient: KinClient;
+let keyStoreProvider: SimpleKeystoreProvider;
 
 describe("KinAccount", async () => {
 	test("blah blah", async done => {
-		senderKeystoreProvider = new SimpleKeystoreProvider();
-		receiverKeystoreProvider = new SimpleKeystoreProvider();
+		keyStoreProvider = new SimpleKeystoreProvider();
+		keyStoreProvider.addKeyPair()
 
-		senderClient = new KinClient(Environment.Testnet, senderKeystoreProvider);
-		receiverClient = new KinClient(Environment.Testnet, receiverKeystoreProvider);
-
-		const transactionId = await senderClient.friendbot({ address: await senderKeystoreProvider.publicAddress, amount: 10000 });
-		const secondTransactionId = await receiverClient.friendbot({address: await receiverKeystoreProvider.publicAddress, amount: 10000});
+		kinClient = new KinClient(Environment.Testnet, keyStoreProvider);
+		const kinAccounts = await kinClient.kinAccounts
+		const transactionId = await kinClient.friendbot({ address: kinAccounts[0].publicAddress, amount: 10000 });
+		const secondTransactionId = await kinClient.friendbot({address: kinAccounts[1].publicAddress, amount: 10000});
 
 		expect(transactionId).toBeDefined();
 		expect(secondTransactionId).toBeDefined();
 
-		const txBuilder = await senderClient.kinAccount.buildSendKin({
-			address: await receiverKeystoreProvider.publicAddress,
+		const txBuilder = await kinAccounts[0].buildSendKin({
+			address: kinAccounts[1].publicAddress,
 			amount: 1,
 			fee: 100,
 			memoText: "Send some kin"
 		});
 
-		await senderClient.kinAccount.submitTransaction(txBuilder);
-		const senderBalance = await senderClient.getAccountBalance();
-		const receiverBalance = await receiverClient.getAccountBalance();
+		await kinAccounts[0].submitTransaction(txBuilder);
+		const senderBalance = await kinAccounts[0].getBalance();
+		const receiverBalance = await kinAccounts[1].getBalance();
 
 		expect(senderBalance).toBe(9998.999);
 		expect(receiverBalance).toBe(10001);
