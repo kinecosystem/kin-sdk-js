@@ -1,11 +1,22 @@
-import {Address, TransactionId, WhitelistPayload} from "../types";
-import {Asset, Keypair, Network, Operation, Server} from "@kinecosystem/kin-sdk";
-import {KeyPair} from "./keyPair";
-import {TransactionBuilder} from "./transactionBuilder";
-import {ErrorDecoder, HorizonError, NetworkError, NetworkMismatchedError} from "../errors";
-import {IBlockchainInfoRetriever} from "./blockchainInfoRetriever";
-import {CHANNEL_TOP_UP_TX_COUNT} from "../config";
-import {TransactionErrorList} from "./errors";
+import { Address, TransactionId, WhitelistPayload } from "../types";
+import {
+	Asset,
+	Keypair,
+	Network,
+	Operation,
+	Server,
+} from "@kinecosystem/kin-sdk";
+import { KeyPair } from "./keyPair";
+import { TransactionBuilder } from "./transactionBuilder";
+import {
+	ErrorDecoder,
+	HorizonError,
+	NetworkError,
+	NetworkMismatchedError,
+} from "../errors";
+import { IBlockchainInfoRetriever } from "./blockchainInfoRetriever";
+import { CHANNEL_TOP_UP_TX_COUNT } from "../config";
+import { TransactionErrorList } from "./errors";
 import KeystoreProvider from "./keystoreProvider";
 import { Transaction as TransactionInterface, Channel } from "..";
 import { Transaction } from "@kinecosystem/kin-sdk";
@@ -19,10 +30,13 @@ interface WhitelistPayloadTemp {
 }
 
 export class TxSender {
-	constructor(private readonly _keystoreProvider: KeystoreProvider,
-				         private readonly _appId: string,
-				         private readonly _server: Server,
-				         private readonly _blockchainInfoRetriever: IBlockchainInfoRetriever) {
+	constructor(
+		private readonly _publicAddress: Address,
+		private readonly _keystoreProvider: KeystoreProvider,
+		private readonly _appId: string,
+		private readonly _server: Server,
+		private readonly _blockchainInfoRetriever: IBlockchainInfoRetriever
+	) {
 		this._keystoreProvider = _keystoreProvider;
 		this._appId = _appId;
 		this._server = _server;
@@ -33,44 +47,70 @@ export class TxSender {
 		return this._appId;
 	}
 
-	public async getTransactionBuilder(txFee: number, channel?: Channel): Promise<TransactionBuilder> {
+	public async getTransactionBuilder(
+		txFee: number,
+		channel?: Channel
+	): Promise<TransactionBuilder> {
 		const response = await this.loadSenderAccountData(channel);
-		return new TransactionBuilder(response, { fee: txFee, appId: this.appId }, channel)
-			.setTimeout(0);
+		return new TransactionBuilder(
+			response,
+			{ fee: txFee, appId: this.appId },
+			channel
+		).setTimeout(0);
 	}
 
-	public async buildCreateAccount(address: Address, startingBalance: number, fee: number, memo?: string, channel?: Channel): Promise<TransactionBuilder> {
+	public async buildCreateAccount(
+		address: Address,
+		startingBalance: number,
+		fee: number,
+		memo?: string,
+		channel?: Channel
+	): Promise<TransactionBuilder> {
 		const builder = await this.getTransactionBuilder(fee, channel);
 		if (memo) {
 			builder.addTextMemo(memo);
 		}
-		builder.addOperation(Operation.createAccount({
-			source: await this._keystoreProvider.publicAddress,
-			destination: address,
-			startingBalance: startingBalance.toString()
-		}));
+		builder.addOperation(
+			Operation.createAccount({
+				source: this._publicAddress,
+				destination: address,
+				startingBalance: startingBalance.toString(),
+			})
+		);
 		return builder;
 	}
 
-	public async buildSendKin(address: Address, amount: number, fee: number, memo?: string, channel?: Channel): Promise<TransactionBuilder> {
+	public async buildSendKin(
+		address: Address,
+		amount: number,
+		fee: number,
+		memo?: string,
+		channel?: Channel
+	): Promise<TransactionBuilder> {
 		const builder = await this.getTransactionBuilder(fee, channel);
 		if (memo) {
 			builder.addTextMemo(memo);
 		}
-		builder.addOperation(Operation.payment({
-			source: await this._keystoreProvider.publicAddress,
-			destination: address,
-			asset: Asset.native(),
-			amount: amount.toString()
-		}));
+		builder.addOperation(
+			Operation.payment({
+				source: this._publicAddress,
+				destination: address,
+				asset: Asset.native(),
+				amount: amount.toString(),
+			})
+		);
 		return builder;
 	}
 
-	public async submitTransaction(builder: TransactionBuilder): Promise<TransactionId> {
+	public async submitTransaction(
+		builder: TransactionBuilder
+	): Promise<TransactionId> {
 		try {
 			const xdrTransaction = builder.build();
-			const signedXdrTransaction = await this._keystoreProvider.signTransaction(xdrTransaction);
-			// console.log(signedXdrTransaction);
+			const signedXdrTransaction = await this._keystoreProvider.signTransaction(
+				this._publicAddress,
+				xdrTransaction
+			);
 			/**
 			 * This code is needs to be implemented by the keystoreProvider
 			 */
@@ -80,7 +120,9 @@ export class TxSender {
 			// 	signers.push(Keypair.fromSecret(builder.channel.keyPair.seed));
 			// }
 			// tx.sign(...signers);
-			const transactionResponse = await this._server.submitTransaction(signedXdrTransaction);
+			const transactionResponse = await this._server.submitTransaction(
+				signedXdrTransaction
+			);
 			return transactionResponse.hash;
 		} catch (e) {
 			const error = ErrorDecoder.translate(e);
@@ -126,11 +168,17 @@ export class TxSender {
 	// 	return buffer.toString();
 	// }
 
-	private checkForInsufficientChannelFeeBalance(builder: TransactionBuilder, error: HorizonError | NetworkError): boolean {
+	private checkForInsufficientChannelFeeBalance(
+		builder: TransactionBuilder,
+		error: HorizonError | NetworkError
+	): boolean {
 		if (!builder.channel) {
 			return false;
 		}
-		return (error as HorizonError).resultTransactionCode === TransactionErrorList.INSUFFICIENT_BALANCE;
+		return (
+			(error as HorizonError).resultTransactionCode ===
+			TransactionErrorList.INSUFFICIENT_BALANCE
+		);
 	}
 
 	private async topUpChannel(builder: TransactionBuilder) {
@@ -142,8 +190,12 @@ export class TxSender {
 	}
 
 	private async loadSenderAccountData(channel?: Channel) {
-		const addressToLoad = channel ? channel.keyPair.publicAddress : await this._keystoreProvider.publicAddress;
-		const response: Server.AccountResponse = await this._server.loadAccount(addressToLoad);
+		const addressToLoad = channel
+			? channel.keyPair.publicAddress
+			: await this._publicAddress;
+		const response: Server.AccountResponse = await this._server.loadAccount(
+			addressToLoad
+		);
 		return response;
 	}
 }

@@ -8,6 +8,7 @@ tests/src/*.js
 tests/src/*.js.map
 tests/src/*.d.ts
 tests/src/kinAccount.ts
+<<<<<<< HEAD
 
 \.DS_Store
 
@@ -26,3 +27,7 @@ public/app\.bundle\.js\.map
 public/sdk-loader\.bundle\.js
 
 public/sdk-loader\.bundle\.js\.map
+=======
+public/client-app.bundle.js
+public/kin-sdk-client.bundle.js 
+>>>>>>> master
