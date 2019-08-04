@@ -40,7 +40,9 @@ import {
 	ServerError
 } from "./errors";
 
+import KeystoreProvider from "./blockchain/keystoreProvider"
 export {
+	KeystoreProvider,
 	KinClient,
 	KinAccount,
 	Environment,

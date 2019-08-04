@@ -1,9 +1,9 @@
-var path = require("path");
-
+const path = require("path");
+const webpack = require("webpack");
 module.exports = {
   entry: {
-    "kin-sdk-client": __dirname + "/scripts/src/client.ts",
-    "client-app": __dirname + "/scripts/src/client-app.ts"
+    app: __dirname + "/scripts/src/web/app.ts",
+    "kin-sdk": __dirname + "/scripts/src/web/sdk.ts"
   },
   devtool: "source-map",
   module: {
@@ -15,6 +15,10 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    // Ignore native modules (ed25519)
+    new webpack.IgnorePlugin(/ed25519/)
+  ],
   resolve: {
     extensions: [".ts", ".js"]
   },
