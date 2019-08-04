@@ -1,33 +1,10 @@
-import { Address, TransactionId, WhitelistPayload } from "../types";
-import {
-	Asset,
-	Keypair,
-	Network,
-	Operation,
-	Server,
-} from "@kinecosystem/kin-sdk";
-import { KeyPair } from "./keyPair";
+import { Address, TransactionId } from "../types";
+import { Asset, Operation, Server } from "@kinecosystem/kin-sdk";
 import { TransactionBuilder } from "./transactionBuilder";
-import {
-	ErrorDecoder,
-	HorizonError,
-	NetworkError,
-	NetworkMismatchedError,
-} from "../errors";
+import { ErrorDecoder } from "../errors";
 import { IBlockchainInfoRetriever } from "./blockchainInfoRetriever";
-import { CHANNEL_TOP_UP_TX_COUNT } from "../config";
-import { TransactionErrorList } from "./errors";
 import KeystoreProvider from "./keystoreProvider";
-import { Transaction as TransactionInterface, Channel } from "..";
-import { Transaction } from "@kinecosystem/kin-sdk";
-import { DecodeTransactionParams } from "./horizonModels";
-
-interface WhitelistPayloadTemp {
-	// The android stellar sdk spells 'envelope' as 'envelop'
-	envelop: string;
-	envelope?: string;
-	networkId: string;
-}
+import { Channel } from "..";
 
 export class TxSender {
 	constructor(
@@ -111,82 +88,14 @@ export class TxSender {
 				this._publicAddress,
 				xdrTransaction
 			);
-			/**
-			 * This code is needs to be implemented by the keystoreProvider
-			 */
-			// const signers = new Array<Keypair>();
-			// signers.push(Keypair.fromSecret(this._keypair.seed));
-			// if (builder.channel) {
-			// 	signers.push(Keypair.fromSecret(builder.channel.keyPair.seed));
-			// }
-			// tx.sign(...signers);
 			const transactionResponse = await this._server.submitTransaction(
 				signedXdrTransaction
 			);
 			return transactionResponse.hash;
 		} catch (e) {
 			const error = ErrorDecoder.translate(e);
-			if (this.checkForInsufficientChannelFeeBalance(builder, error)) {
-				await this.topUpChannel(builder);
-				// Insufficient balance is a "fast-fail", the sequence number doesn't increment
-				// so there is no need to build the transaction again
-				return this.submitTransaction(builder);
-			} else {
-				throw error;
-			}
+			throw error;
 		}
-	}
-
-	// public whitelistTransaction(payload: string | WhitelistPayload): string {
-	// 	let txPair: WhitelistPayload | WhitelistPayloadTemp;
-	// 	if (typeof payload === "string") {
-	// 		const tx = JSON.parse(payload);
-	// 		if (tx.envelop != null) {
-	// 			txPair = tx as WhitelistPayloadTemp;
-	// 			txPair.envelope = txPair.envelop;
-	// 		} else {
-	// 			txPair = tx as WhitelistPayload;
-	// 		}
-	// 	} else {
-	// 		txPair = payload;
-	// 	}
-
-	// 	if (typeof txPair.envelope !== "string") {
-	// 		throw new TypeError("'envelope' must be type of string");
-	// 	}
-
-	// 	const networkPassphrase = Network.current().networkPassphrase();
-	// 	if (networkPassphrase !== txPair.networkId) {
-	// 		throw new NetworkMismatchedError("Unable to sign whitelist transaction, network type is mismatched");
-	// 	}
-
-	// 	const transaction = new XdrTransaction(txPair.envelope);
-	// 	transaction.sign(Keypair.fromSecret(this._keypair.seed));
-	// 	const envelope = transaction.toEnvelope();
-	// 	const buffer = envelope.toXDR("base64");
-
-	// 	return buffer.toString();
-	// }
-
-	private checkForInsufficientChannelFeeBalance(
-		builder: TransactionBuilder,
-		error: HorizonError | NetworkError
-	): boolean {
-		if (!builder.channel) {
-			return false;
-		}
-		return (
-			(error as HorizonError).resultTransactionCode ===
-			TransactionErrorList.INSUFFICIENT_BALANCE
-		);
-	}
-
-	private async topUpChannel(builder: TransactionBuilder) {
-		// const channel = builder.channel as Channel;
-		// const fee = await this._blockchainInfoRetriever.getMinimumFee();
-		// const amount = fee * CHANNEL_TOP_UP_TX_COUNT;
-		// const topUpBuilder = await this.buildSendKin(channel.keyPair.publicAddress, amount, fee);
-		// await this.submitTransaction(topUpBuilder);
 	}
 
 	private async loadSenderAccountData(channel?: Channel) {
