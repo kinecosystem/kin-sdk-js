@@ -2,6 +2,6 @@ import {Address} from "../types";
 import {Transaction as XdrTransaction} from "@kinecosystem/kin-sdk";
 
 export default interface KeystoreProvider {
-    publicAddress: Promise<Address>;
-    signTransaction(xdrTransaction: XdrTransaction ): Promise<XdrTransaction>;
+    accounts: Promise<Array<Address>>;
+    signTransaction(publicAddress: Address, xdrTransaction: XdrTransaction ): Promise<XdrTransaction>;
 }
