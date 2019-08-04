@@ -35,9 +35,6 @@ export default class SimpleKeystoreProvider implements KeystoreProvider {
 				const signers = new Array<Keypair>();
 				signers.push(Keypair.fromSecret(keypair.seed));
 				xdrTransaction.sign(...signers);
-
-				console.log("SimpleKeystoreProvider::signTransaction");
-				console.log(xdrTransaction);
 			}
 			resolve(xdrTransaction);
 		});
