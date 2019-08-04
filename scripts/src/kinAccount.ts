@@ -14,7 +14,7 @@ export class KinAccount {
 	private readonly _txSender: TxSender;
 	private readonly _channelsPool?: ChannelsPool;
 
-	constructor(private readonly _keystoreProvider: KeystoreProvider,
+	constructor(private readonly _publicAddress:Address, private readonly _keystoreProvider: KeystoreProvider,
 				private readonly _accountDataRetriever: AccountDataRetriever, server: Server, blockchainInfoRetriever: IBlockchainInfoRetriever,
 				private readonly _appId: string = config.ANON_APP_ID, private readonly _channelSecretKeys?: string[]) {
 		if (!config.APP_ID_REGEX.test(_appId)) {
@@ -23,11 +23,11 @@ export class KinAccount {
 		if (_channelSecretKeys) {
 			this._channelsPool = new ChannelsPool(_channelSecretKeys);
 		}
-		this._txSender = new TxSender(_keystoreProvider, this._appId, server, blockchainInfoRetriever);
+		this._txSender = new TxSender(_publicAddress, _keystoreProvider, this._appId, server, blockchainInfoRetriever);
 	}
 
-	 get publicAddress(): Promise<Address> {
-		return this._keystoreProvider.publicAddress;
+	 get publicAddress(): Address {
+		return this._publicAddress;
 	}
 
 	get appId(): string {

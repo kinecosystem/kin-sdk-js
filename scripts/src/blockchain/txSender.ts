@@ -19,7 +19,7 @@ interface WhitelistPayloadTemp {
 }
 
 export class TxSender {
-	constructor(private readonly _keystoreProvider: KeystoreProvider,
+	constructor(private readonly _publicAddress:Address, private readonly _keystoreProvider: KeystoreProvider,
 				         private readonly _appId: string,
 				         private readonly _server: Server,
 				         private readonly _blockchainInfoRetriever: IBlockchainInfoRetriever) {
@@ -45,7 +45,7 @@ export class TxSender {
 			builder.addTextMemo(memo);
 		}
 		builder.addOperation(Operation.createAccount({
-			source: await this._keystoreProvider.publicAddress,
+			source: this._publicAddress,
 			destination: address,
 			startingBalance: startingBalance.toString()
 		}));
@@ -58,7 +58,7 @@ export class TxSender {
 			builder.addTextMemo(memo);
 		}
 		builder.addOperation(Operation.payment({
-			source: await this._keystoreProvider.publicAddress,
+			source: this._publicAddress,
 			destination: address,
 			asset: Asset.native(),
 			amount: amount.toString()
@@ -71,7 +71,7 @@ export class TxSender {
 			const xdrTransaction = builder.build();
 			console.log("submitTransaction::submitTransaction::xdrTransaction");
 			console.log(xdrTransaction);
-			const signedXdrTransaction = await this._keystoreProvider.signTransaction(xdrTransaction);
+			const signedXdrTransaction = await this._keystoreProvider.signTransaction(this._publicAddress, xdrTransaction);
 			/**
 			 * This code is needs to be implemented by the keystoreProvider
 			 */
@@ -143,7 +143,7 @@ export class TxSender {
 	}
 
 	private async loadSenderAccountData(channel?: Channel) {
-		const addressToLoad = channel ? channel.keyPair.publicAddress : await this._keystoreProvider.publicAddress;
+		const addressToLoad = channel ? channel.keyPair.publicAddress : await this._publicAddress;
 		const response: Server.AccountResponse = await this._server.loadAccount(addressToLoad);
 		return response;
 	}
