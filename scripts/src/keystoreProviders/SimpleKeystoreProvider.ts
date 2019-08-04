@@ -1,4 +1,5 @@
-import { KeystoreProvider, KeyPair } from "..";
+import KeystoreProvider from "../blockchain/keystoreProvider";
+import { KeyPair } from "..";
 import { Keypair, Transaction } from "@kinecosystem/kin-base";
 
 export default class SimpleKeystoreProvider implements KeystoreProvider {

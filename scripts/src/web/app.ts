@@ -6,7 +6,7 @@ interface Window {
 	let kinClient;
 	let keyStoreProvider;
 
-	keyStoreProvider = new window.KinSdk.SimpleKeystoreProvider();
+	keyStoreProvider = new window.KinSdk.keystoreProviders.SimpleKeystoreProvider();
 	keyStoreProvider.addKeyPair();
 
 	kinClient = new window.KinSdk.KinClient(

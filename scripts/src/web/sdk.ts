@@ -1,5 +1,5 @@
 import * as KinSdk from "..";
-import SimpleKeystoreProvider from "../keystoreProviders/SimpleKeystoreProvider";
+import * as KeystoreProviders from "../keystoreProviders";
 
 declare global {
 	interface Window {
@@ -8,4 +8,4 @@ declare global {
 }
 
 window.KinSdk = KinSdk;
-window.KinSdk.SimpleKeystoreProvider = SimpleKeystoreProvider;
+window.KinSdk.keystoreProviders = KeystoreProviders;
