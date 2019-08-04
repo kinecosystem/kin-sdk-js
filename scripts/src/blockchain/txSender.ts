@@ -6,7 +6,7 @@ import {ErrorDecoder, HorizonError, NetworkError, NetworkMismatchedError} from "
 import {IBlockchainInfoRetriever} from "./blockchainInfoRetriever";
 import {CHANNEL_TOP_UP_TX_COUNT} from "../config";
 import {TransactionErrorList} from "./errors";
-import KeystoreProvider from "../keystoreProviders/keystoreProviderInterface";
+import KeystoreProvider from "./keystoreProvider";
 import { Transaction as TransactionInterface, Channel } from "..";
 import { Transaction } from "@kinecosystem/kin-sdk";
 import { DecodeTransactionParams } from "./horizonModels";
@@ -69,9 +69,8 @@ export class TxSender {
 	public async submitTransaction(builder: TransactionBuilder): Promise<TransactionId> {
 		try {
 			const xdrTransaction = builder.build();
-			console.log("submitTransaction::submitTransaction::xdrTransaction");
-			console.log(xdrTransaction);
 			const signedXdrTransaction = await this._keystoreProvider.signTransaction(xdrTransaction);
+			// console.log(signedXdrTransaction);
 			/**
 			 * This code is needs to be implemented by the keystoreProvider
 			 */

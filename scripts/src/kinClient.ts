@@ -1,6 +1,6 @@
 import {Environment} from "./environment";
 import {KinAccount} from "./kinAccount";
-import KeystoreProvider  from "./keystoreProviders/keystoreProviderInterface"
+import KeystoreProvider from "./blockchain/keystoreProvider"
 import {
 	AccountData,
 	Balance,
