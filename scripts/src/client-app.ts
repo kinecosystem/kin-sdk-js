@@ -11,6 +11,7 @@ declare global {
 	let keyStoreProvider;
 
 	keyStoreProvider = new SimpleKeystoreProvider();
+	keyStoreProvider.addKeyPair()
 
 	kinClient = new window.KinSdk.KinClient(
 		window.KinSdk.Environment.Testnet,
