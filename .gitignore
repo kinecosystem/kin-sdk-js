@@ -31,3 +31,5 @@ public/sdk-loader\.bundle\.js\.map
 public/client-app.bundle.js
 public/kin-sdk-client.bundle.js 
 >>>>>>> master
+
+*.js

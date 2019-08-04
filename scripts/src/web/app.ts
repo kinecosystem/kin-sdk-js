@@ -33,8 +33,8 @@ interface Window {
 	});
 
 	await accounts[0].submitTransaction(txBuilder);
-	const senderBalance = accounts[0].getBalance();
-	const receiverBalance = accounts[1].getBalance();
+	const senderBalance = await accounts[0].getBalance();
+	const receiverBalance = await accounts[1].getBalance();
 
 	console.log(senderBalance);
 	console.log(receiverBalance);
