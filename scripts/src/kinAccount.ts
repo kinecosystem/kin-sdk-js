@@ -8,7 +8,7 @@ import { KeyPair } from "./blockchain/keyPair";
 import { TransactionBuilder } from "./blockchain/transactionBuilder";
 import { Channel, ChannelsPool } from "./blockchain/channelsPool";
 import { IBlockchainInfoRetriever } from "./blockchain/blockchainInfoRetriever";
-import KeystoreProvider from "./keystoreProviders/keystoreProviderInterface";
+import KeystoreProvider from "./blockchain/keystoreProvider";
 
 export class KinAccount {
 	private readonly _txSender: TxSender;
