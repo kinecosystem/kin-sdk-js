@@ -1,11 +1,11 @@
 const path = require("path");
 const webpack = require("webpack");
+
 module.exports = {
   entry: {
     app: __dirname + "/scripts/src/web/app.ts",
     "kin-sdk": __dirname + "/scripts/src/web/sdk.ts"
   },
-  devtool: "source-map",
   module: {
     rules: [
       {
@@ -15,12 +15,23 @@ module.exports = {
       }
     ]
   },
-  plugins: [
-    // Ignore native modules (ed25519)
-    new webpack.IgnorePlugin(/ed25519/)
-  ],
   resolve: {
     extensions: [".ts", ".js"]
+  },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10
+        },
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true
+        }
+      }
+    }
   },
   output: {
     filename: "./[name].bundle.js",
