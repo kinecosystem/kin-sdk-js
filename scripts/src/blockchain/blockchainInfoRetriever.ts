@@ -19,4 +19,5 @@ export class BlockchainInfoRetriever implements IBlockchainInfoRetriever {
 			throw ErrorDecoder.translate(e);
 		}
 	}
+
 }

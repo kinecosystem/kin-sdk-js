@@ -1,6 +1,6 @@
 import KeystoreProvider from "../blockchain/keystoreProvider";
-import { KeyPair } from "..";
-import { Keypair, Transaction } from "@kinecosystem/kin-base";
+import { KeyPair, Address } from "..";
+import { Keypair, Transaction } from "@kinecosystem/kin-sdk";
 
 export default class SimpleKeystoreProvider implements KeystoreProvider {
 	private readonly _keypairs: KeyPair[];
@@ -15,29 +15,21 @@ export default class SimpleKeystoreProvider implements KeystoreProvider {
 		this._keypairs[this._keypairs.length] = KeyPair.generate();
 	}
 
-	public get accounts(): Promise<string[]> {
-		return new Promise(resolve => {
-			const accountList = new Array(this._keypairs.length);
-			for (let i = 0; i < this._keypairs.length; i++) {
-				accountList[i] = this._keypairs[i].publicAddress;
-			}
-			resolve(accountList);
-		});
+	public get accounts(): Promise<Address[]> {
+		return Promise.resolve(this._keypairs.map(keypay => keypay.publicAddress));
 	}
 
 	public signTransaction(
-		accountAddress: string,
+		accountAddress: Address,
 		xdrTransaction: Transaction
 	): Promise<Transaction> {
-		return new Promise(resolve => {
-			const keypair = this.getKeyPairFor(accountAddress);
-			if (keypair != null) {
-				const signers = new Array<Keypair>();
-				signers.push(Keypair.fromSecret(keypair.seed));
-				xdrTransaction.sign(...signers);
-			}
-			resolve(xdrTransaction);
-		});
+		const keypair = this.getKeyPairFor(accountAddress);
+		if (keypair != null) {
+			const signers = new Array<Keypair>();
+			signers.push(Keypair.fromSecret(keypair.seed));
+			xdrTransaction.sign(...signers);
+		}
+		return  Promise.resolve(xdrTransaction);
 	}
 
 	private getKeyPairFor(publicAddress: string): KeyPair | null {

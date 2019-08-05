@@ -5,9 +5,9 @@ import {
 	PaymentListenerParams,
 	TransactionHistoryParams
 } from "./kinClient";
-import {CreateAccountParams, GetTransactionParams, KinAccount, SendKinParams} from "./kinAccount";
-import {Environment} from "./environment";
-import {Address, TransactionId, WhitelistPayload} from "./types"
+import { CreateAccountParams, GetTransactionParams, KinAccount, SendKinParams } from "./kinAccount";
+import { Environment } from "./environment";
+import { Address, TransactionId, WhitelistPayload } from "./types";
 import {
 	AccountData,
 	AssetType,
@@ -19,13 +19,11 @@ import {
 	RawTransaction,
 	Transaction
 } from "./blockchain/horizonModels";
-import {KeyPair} from "./blockchain/keyPair";
-import {Channel, ChannelsPool, ChannelsPoolStatus, ChannelState} from "./blockchain/channelsPool";
+import { KeyPair } from "./blockchain/keyPair";
 import {
 	AccountExistsError,
 	AccountNotActivatedError,
 	BadRequestError,
-	ChannelBusyError,
 	ErrorType,
 	FriendbotError,
 	HorizonError,
@@ -40,7 +38,7 @@ import {
 	ServerError
 } from "./errors";
 
-import KeystoreProvider from "./blockchain/keystoreProvider"
+import KeystoreProvider from "./blockchain/keystoreProvider";
 export {
 	KeystoreProvider,
 	KinClient,
@@ -66,16 +64,11 @@ export {
 	CreateAccountParams,
 	SendKinParams,
 	WhitelistPayload,
-	ChannelsPool,
-	Channel,
-	ChannelsPoolStatus,
-	ChannelState,
 	KinSdkError,
 	NetworkError,
 	ServerError,
 	FriendbotError,
 	InvalidAddressError,
-	ChannelBusyError,
 	NetworkMismatchedError,
 	InvalidDataError,
 	BadRequestError,

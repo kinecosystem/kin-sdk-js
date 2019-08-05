@@ -4,34 +4,24 @@ const webpack = require("webpack");
 module.exports = {
   entry: {
     app: __dirname + "/scripts/src/web/app.ts",
-    "kin-sdk": __dirname + "/scripts/src/web/sdk.ts"
+    "kin-sdk-web": __dirname + "/scripts/src/web/sdk.ts"
   },
   module: {
     rules: [
       {
         test: /\.ts$/,
-        use: "ts-loader",
+        use: {
+          loader: 'ts-loader',
+          options: {
+            transpileOnly: true
+          }
+        },
         exclude: /node_modules/
       }
     ]
   },
   resolve: {
     extensions: [".ts", ".js"]
-  },
-  optimization: {
-    splitChunks: {
-      cacheGroups: {
-        vendors: {
-          test: /[\\/]node_modules[\\/]/,
-          priority: -10
-        },
-        default: {
-          minChunks: 2,
-          priority: -20,
-          reuseExistingChunk: true
-        }
-      }
-    }
   },
   output: {
     filename: "./[name].bundle.js",

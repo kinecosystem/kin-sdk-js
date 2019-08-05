@@ -1,9 +1,10 @@
 import { Transaction } from "@kinecosystem/kin-sdk";
+import { Address } from "..";
 
 export default interface KeystoreProvider {
-	accounts: Promise<string[]>;
+	accounts: Promise<Address[]>;
 	signTransaction(
-		accountAddress: string,
+		accountAddress: Address,
 		xdrTransaction: Transaction
 	): Promise<Transaction>;
 }
