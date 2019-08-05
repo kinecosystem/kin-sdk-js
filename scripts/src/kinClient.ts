@@ -11,8 +11,7 @@ import { Friendbot } from "./friendbot";
 import { BlockchainInfoRetriever } from "./blockchain/blockchainInfoRetriever";
 import { Address, TransactionId } from "./types";
 import { BlockchainListener } from "./blockchain/blockchainListeners";
-import { ANON_APP_ID, GLOBAL_HEADERS, GLOBAL_RETRY } from "./config";
-import { resolve } from "dns";
+import { GLOBAL_HEADERS, GLOBAL_RETRY } from "./config";
 
 export class KinClient {
 
