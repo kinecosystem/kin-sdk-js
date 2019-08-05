@@ -25,14 +25,18 @@ interface Window {
 		amount: 10000,
 	});
 
-	const txBuilder = await accounts[0].buildSendKin({
+	const transaction = await accounts[0].buildTransaction({
 		address: accounts[1].publicAddress,
 		amount: 1,
 		fee: 100,
 		memoText: "Send some kin",
 	});
+	// const transactionString = toWhitelistableTransaction.toWhitelistableTransaction();
+	// console.log(transactionString);
 
-	await accounts[0].submitTransaction(txBuilder);
+	// await accounts[0].sendWhitelistableTransaction(transactionString);
+	await accounts[0].submitTransaction(transaction);
+
 	const senderBalance = await accounts[0].getBalance();
 	const receiverBalance = await accounts[1].getBalance();
 

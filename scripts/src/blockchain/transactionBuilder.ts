@@ -7,8 +7,7 @@ import {
 	TransactionBuilder as BaseTransactionBuilder,
 	xdr
 } from "@kinecosystem/kin-sdk";
-import {Channel} from "./channelsPool";
-import {MEMO_LENGTH, MEMO_LENGTH_ERROR} from "../config";
+import { MEMO_LENGTH, MEMO_LENGTH_ERROR } from "../config";
 
 interface TransactionBuilderOptions extends BaseTransactionBuilder.TransactionBuilderOptions {
 	fee: number;
@@ -19,15 +18,13 @@ interface TransactionBuilderOptions extends BaseTransactionBuilder.TransactionBu
 export class TransactionBuilder {
 
 	private readonly _transactionBuilder: BaseTransactionBuilder;
-	private readonly _channel?: Channel;
 	private readonly _appId?: string;
 
-	constructor(sourceAccount: Account, options: TransactionBuilderOptions, channel?: Channel) {
+	constructor(sourceAccount: Account, options: TransactionBuilderOptions) {
 		this._transactionBuilder = new BaseTransactionBuilder(sourceAccount, options);
 		this._appId = options.appId;
 		this.addFee(options.fee);
 		this.addMemo(options.memo ? options.memo : Memo.text(""));
-		this._channel = channel;
 	}
 
 	public addFee(fee: number): this {
@@ -48,7 +45,7 @@ export class TransactionBuilder {
 		if (memo && typeof memo === "string" && memo.length > MEMO_LENGTH) {
 			throw new Error(MEMO_LENGTH_ERROR);
 		}
-		this.addMemo(memo ?  Memo.text(memo) : Memo.text(""));
+		this.addMemo(memo ? Memo.text(memo) : Memo.text(""));
 	}
 
 	public addMemo(memo: Memo): this {
@@ -72,11 +69,11 @@ export class TransactionBuilder {
 		return this;
 	}
 
-	public get channel(): Channel | undefined {
-		return this._channel;
-	}
-
 	public build(): Transaction {
 		return this._transactionBuilder.build();
+	}
+
+	public toWhitelistableTransaction(): string {
+		return this.build().toEnvelope().toXDR().toString("base64");
 	}
 }

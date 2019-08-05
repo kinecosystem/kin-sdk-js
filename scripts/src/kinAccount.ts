@@ -2,31 +2,25 @@ import { AccountData, Balance } from "./blockchain/horizonModels";
 import { Server } from "@kinecosystem/kin-sdk";
 import { AccountDataRetriever } from "./blockchain/accountDataRetriever";
 import { TxSender } from "./blockchain/txSender";
-import { Address, TransactionId, WhitelistPayload } from "./types";
+import { Address, TransactionId } from "./types";
 import * as config from "./config";
-import { KeyPair } from "./blockchain/keyPair";
 import { TransactionBuilder } from "./blockchain/transactionBuilder";
-import { Channel, ChannelsPool } from "./blockchain/channelsPool";
 import { IBlockchainInfoRetriever } from "./blockchain/blockchainInfoRetriever";
 import KeystoreProvider from "./blockchain/keystoreProvider";
 
 export class KinAccount {
 	private readonly _txSender: TxSender;
-	private readonly _channelsPool?: ChannelsPool;
 
-	constructor(private readonly _publicAddress:Address, private readonly _keystoreProvider: KeystoreProvider,
-				private readonly _accountDataRetriever: AccountDataRetriever, server: Server, blockchainInfoRetriever: IBlockchainInfoRetriever,
-				private readonly _appId: string = config.ANON_APP_ID, private readonly _channelSecretKeys?: string[]) {
+	constructor(private readonly _publicAddress: Address, _keystoreProvider: KeystoreProvider,
+		           private readonly _accountDataRetriever: AccountDataRetriever, server: Server, blockchainInfoRetriever: IBlockchainInfoRetriever,
+		           private readonly _appId: string = config.ANON_APP_ID) {
 		if (!config.APP_ID_REGEX.test(_appId)) {
 			throw new Error("Invalid app id: " + _appId);
-		}
-		if (_channelSecretKeys) {
-			this._channelsPool = new ChannelsPool(_channelSecretKeys);
 		}
 		this._txSender = new TxSender(_publicAddress, _keystoreProvider, this._appId, server, blockchainInfoRetriever);
 	}
 
-	 get publicAddress(): Address {
+	get publicAddress(): Address {
 		return this._publicAddress;
 	}
 
@@ -34,37 +28,40 @@ export class KinAccount {
 		return this._appId;
 	}
 
-	get channelsPool(): ChannelsPool | undefined {
-		return this._channelsPool;
-	}
-
 	public async getBalance(): Promise<Balance> {
-		return await this._accountDataRetriever.fetchKinBalance(await this.publicAddress);
+		return await this._accountDataRetriever.fetchKinBalance(this._publicAddress);
 	}
 
-	async getData(): Promise<AccountData> {
-		return await this._accountDataRetriever.fetchAccountData(await this.publicAddress);
+	public async getData(): Promise<AccountData> {
+		return await this._accountDataRetriever.fetchAccountData(this._publicAddress);
 	}
 
 	public async getTransactionBuilder(param: GetTransactionParams): Promise<TransactionBuilder> {
-		return await this._txSender.getTransactionBuilder(param.fee, param.channel);
+		return await this._txSender.getTransactionBuilder(param.fee);
 	}
 
 	public async buildCreateAccount(params: CreateAccountParams): Promise<TransactionBuilder> {
-		return await this._txSender.buildCreateAccount(params.address, params.startingBalance, params.fee, params.memoText, params.channel);
+		return await this._txSender.buildCreateAccount(params.address, params.startingBalance, params.fee, params.memoText);
 	}
 
-	async buildSendKin(params: SendKinParams): Promise<TransactionBuilder> {
-		return await this._txSender.buildSendKin(params.address, params.amount, params.fee, params.memoText, params.channel);
+	public async buildTransaction(params: SendKinParams): Promise<TransactionBuilder> {
+		return await this._txSender.buildTransaction(params.address, params.amount, params.fee, params.memoText);
 	}
 
-	async submitTransaction(transactionBuilder: TransactionBuilder): Promise<TransactionId> {
+	public async submitTransaction(transactionBuilder: TransactionBuilder): Promise<TransactionId> {
 		return await this._txSender.submitTransaction(transactionBuilder);
 	}
 
-	// whitelistTransaction(payload: string | WhitelistPayload): string {
-	// 	return this._txSender.whitelistTransaction(payload);
-	// }
+	public async sendWhitelistableTransaction(transaction: string): Promise<string> {
+		return await this._txSender.sendWhitelistableTransaction(transaction);
+	}
+
+	/**
+	 * Check if the account exists on kin blockchain.
+	 */
+	public async isAccountExisting(): Promise<Boolean> {
+		return await this._accountDataRetriever.isAccountExisting(await this._publicAddress);
+	}
 }
 
 export interface CreateAccountParams {
@@ -86,11 +83,6 @@ export interface CreateAccountParams {
 	 * Optional text to put into transaction memo, up to 21 chars.
 	 */
 	memoText?: string;
-
-	/**
-	 * Optional channel to build the transaction with
-	 */
-	channel?: Channel;
 }
 
 export interface SendKinParams {
@@ -112,11 +104,6 @@ export interface SendKinParams {
 	 * Optional text to put into transaction memo, up to 21 chars.
 	 */
 	memoText?: string;
-
-	/**
-	 * Optional channel to build the transaction with
-	 */
-	channel?: Channel;
 }
 
 export interface GetTransactionParams {
@@ -125,9 +112,4 @@ export interface GetTransactionParams {
 	 * Fee to be deducted for the transaction.
 	 */
 	fee: number;
-
-	/**
-	 * Optional channel to build the transaction with
-	 */
-	channel?: Channel;
 }

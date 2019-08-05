@@ -39,7 +39,6 @@ export type ErrorType =
 	| 'ServerError'
 	| 'FriendbotError'
 	| 'InvalidAddressError'
-	| 'ChannelBusyError'
 	| 'NetworkMismatchedError'
 	| 'InvalidDataError'
 	| 'BadRequestError'
@@ -137,14 +136,6 @@ export class InvalidAddressError extends Error implements KinSdkError {
 
 	constructor() {
 		super('Invalid wallet address.');
-	}
-}
-
-export class ChannelBusyError extends Error implements KinSdkError {
-	readonly type: ErrorType = 'ChannelBusyError';
-
-	constructor() {
-		super('Cannot acquire a free channel.');
 	}
 }
 
@@ -296,4 +287,3 @@ export class ErrorDecoder {
 		return false;
 	}
 }
-

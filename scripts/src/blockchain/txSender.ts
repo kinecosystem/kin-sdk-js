@@ -1,10 +1,10 @@
 import { Address, TransactionId } from "../types";
 import { Asset, Operation, Server } from "@kinecosystem/kin-sdk";
+import { Transaction, xdr } from "@kinecosystem/kin-base";
 import { TransactionBuilder } from "./transactionBuilder";
 import { ErrorDecoder } from "../errors";
 import { IBlockchainInfoRetriever } from "./blockchainInfoRetriever";
 import KeystoreProvider from "./keystoreProvider";
-import { Channel } from "..";
 
 export class TxSender {
 	constructor(
@@ -24,26 +24,17 @@ export class TxSender {
 		return this._appId;
 	}
 
-	public async getTransactionBuilder(
-		txFee: number,
-		channel?: Channel
-	): Promise<TransactionBuilder> {
-		const response = await this.loadSenderAccountData(channel);
+	public async getTransactionBuilder(txFee: number): Promise<TransactionBuilder> {
+		const response = await this.loadSenderAccountData();
 		return new TransactionBuilder(
 			response,
 			{ fee: txFee, appId: this.appId },
-			channel
+
 		).setTimeout(0);
 	}
 
-	public async buildCreateAccount(
-		address: Address,
-		startingBalance: number,
-		fee: number,
-		memo?: string,
-		channel?: Channel
-	): Promise<TransactionBuilder> {
-		const builder = await this.getTransactionBuilder(fee, channel);
+	public async buildCreateAccount(address: Address, startingBalance: number, fee: number, memo?: string): Promise<TransactionBuilder> {
+		const builder = await this.getTransactionBuilder(fee);
 		if (memo) {
 			builder.addTextMemo(memo);
 		}
@@ -57,14 +48,8 @@ export class TxSender {
 		return builder;
 	}
 
-	public async buildSendKin(
-		address: Address,
-		amount: number,
-		fee: number,
-		memo?: string,
-		channel?: Channel
-	): Promise<TransactionBuilder> {
-		const builder = await this.getTransactionBuilder(fee, channel);
+	public async buildTransaction(address: Address, amount: number, fee: number, memo?: string): Promise<TransactionBuilder> {
+		const builder = await this.getTransactionBuilder(fee);
 		if (memo) {
 			builder.addTextMemo(memo);
 		}
@@ -79,11 +64,10 @@ export class TxSender {
 		return builder;
 	}
 
-	public async submitTransaction(
-		builder: TransactionBuilder
-	): Promise<TransactionId> {
+	public async sendWhitelistableTransaction(transaction: string): Promise<TransactionId> {
 		try {
-			const xdrTransaction = builder.build();
+			const transactionEnvelope = xdr.TransactionEnvelope.fromXDR(new Buffer(transaction, "base64"));
+			const xdrTransaction = new Transaction(transactionEnvelope);
 			const signedXdrTransaction = await this._keystoreProvider.signTransaction(
 				this._publicAddress,
 				xdrTransaction
@@ -98,12 +82,33 @@ export class TxSender {
 		}
 	}
 
-	private async loadSenderAccountData(channel?: Channel) {
-		const addressToLoad = channel
-			? channel.keyPair.publicAddress
-			: await this._publicAddress;
+	public async submitTransaction(transaction: TransactionBuilder | Transaction): Promise<TransactionId> {
+		try {
+			let xdrTransaction;
+			if (transaction instanceof TransactionBuilder) {
+				xdrTransaction = transaction.build();
+			} else if (transaction instanceof Transaction) {
+				xdrTransaction = transaction;
+			} else {
+				throw new Error("submitTransaction type mismatch");
+			}
+			const signedXdrTransaction = await this._keystoreProvider.signTransaction(
+				this._publicAddress,
+				xdrTransaction
+			);
+			const transactionResponse = await this._server.submitTransaction(
+				signedXdrTransaction
+			);
+			return transactionResponse.hash;
+		} catch (e) {
+			const error = ErrorDecoder.translate(e);
+			throw error;
+		}
+	}
+
+	private async loadSenderAccountData() {
 		const response: Server.AccountResponse = await this._server.loadAccount(
-			addressToLoad
+			this._publicAddress
 		);
 		return response;
 	}
