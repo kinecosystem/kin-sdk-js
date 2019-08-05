@@ -33,3 +33,7 @@ public/kin-sdk-client.bundle.js
 >>>>>>> master
 
 *.js
+
+public/
+
+stats\.json

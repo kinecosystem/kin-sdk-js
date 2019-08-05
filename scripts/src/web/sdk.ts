@@ -1,11 +1,9 @@
 import * as KinSdk from "..";
-import * as KeystoreProviders from "../keystoreProviders";
 
 declare global {
 	interface Window {
-		KinSdk: any;
+		KinSdk: typeof KinSdk;
 	}
 }
 
 window.KinSdk = KinSdk;
-window.KinSdk.keystoreProviders = KeystoreProviders;

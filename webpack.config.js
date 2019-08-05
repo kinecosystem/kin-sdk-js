@@ -1,11 +1,13 @@
 const path = require("path");
 const webpack = require("webpack");
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   entry: {
-    app: __dirname + "/scripts/src/web/app.ts",
-    "kin-sdk-web": __dirname + "/scripts/src/web/sdk.ts"
+    "kin-sdk-web": __dirname + "/scripts/src/web/sdk.ts",
+    app: __dirname + "/scripts/src/web/app.ts"
   },
+  target: 'web',
   module: {
     rules: [
       {
@@ -26,5 +28,14 @@ module.exports = {
   output: {
     filename: "./[name].bundle.js",
     path: path.resolve(__dirname, "public")
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      filename: 'index.html'
+    })
+  ],
+  optimization: {
+    removeAvailableModules: true,
+    mergeDuplicateChunks: true,
   }
 };

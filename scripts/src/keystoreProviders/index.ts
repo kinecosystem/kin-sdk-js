@@ -1,2 +1,3 @@
 import SimpleKeystoreProvider from "./simpleKeystoreProvider";
-export { SimpleKeystoreProvider };
+import KeystoreProvider from "../blockchain/keystoreProvider";
+export { KeystoreProvider, SimpleKeystoreProvider };
