@@ -7,7 +7,7 @@ import {
 	Transaction,
 	TransactionBase,
 } from "./horizonModels";
-import {TransactionId} from "../types";
+import {TransactionId} from "..";
 import {TransactionHistoryParams} from "../kinClient";
 
 export interface ITransactionRetriever {

@@ -9,9 +9,9 @@ import { Network, Server } from "@kinecosystem/kin-sdk";
 import { AccountDataRetriever } from "./blockchain/accountDataRetriever";
 import { Friendbot } from "./friendbot";
 import { BlockchainInfoRetriever } from "./blockchain/blockchainInfoRetriever";
-import { Address, TransactionId } from "./types";
+import { Address, TransactionId } from "./types/miscs";
 import { BlockchainListener } from "./blockchain/blockchainListeners";
-import { GLOBAL_HEADERS, GLOBAL_RETRY } from "./config";
+import { GLOBAL_RETRY } from "./config";
 
 export class KinClient {
 
@@ -24,7 +24,7 @@ export class KinClient {
 
 	constructor(private readonly _environment: Environment, private readonly _keystoreProvider: KeystoreProvider, private readonly _appId?: string) {
 		this._environment = _environment;
-		this._server = new Server(_environment.url, { allowHttp: false, headers: GLOBAL_HEADERS, retry: GLOBAL_RETRY });
+		this._server = new Server(_environment.url, { allowHttp: false, retry: GLOBAL_RETRY });
 		Network.use(new Network(_environment.passphrase));
 		this._accountDataRetriever = new AccountDataRetriever(this._server);
 		this._friendbotHandler = _environment.friendbotUrl ? new Friendbot(_environment.friendbotUrl, this._accountDataRetriever) : undefined;

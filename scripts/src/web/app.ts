@@ -1,16 +1,13 @@
-interface Window {
-	KinSdk: any;
-}
-
 (async function() {
 	let kinClient;
 	let keyStoreProvider;
+	const KinSdk = window.KinSdk;
 
-	keyStoreProvider = new window.KinSdk.keystoreProviders.SimpleKeystoreProvider();
+	keyStoreProvider = new KinSdk.KeystoreProviders.SimpleKeystoreProvider();
 	keyStoreProvider.addKeyPair();
 
-	kinClient = new window.KinSdk.KinClient(
-		window.KinSdk.Environment.Testnet,
+	kinClient = new KinSdk.KinClient(
+		KinSdk.Environment.Testnet,
 		keyStoreProvider
 	);
 

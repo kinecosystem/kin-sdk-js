@@ -1,4 +1,4 @@
-import KeystoreProvider from "../blockchain/keystoreProvider";
+import { KeystoreProvider } from ".";
 import { KeyPair, Address } from "..";
 import { Keypair, Transaction } from "@kinecosystem/kin-sdk";
 
