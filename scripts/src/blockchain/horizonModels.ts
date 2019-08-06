@@ -1,5 +1,4 @@
 import {Memo, Operation, xdr} from "@kinecosystem/kin-sdk";
-import {TransactionRetriever} from "./transactionRetriever";
 
 export type Balance = number;
 export type Address = string;
@@ -12,7 +11,6 @@ export interface AccountData {
 	readonly sequenceNumber: number;
 	readonly pagingToken: string;
 	readonly subentryCount: number;
-	readonly thresholds: AccountData.Thresholds;
 	readonly flags: AccountData.Flags;
 	readonly balances: AccountData.Balance[];
 	readonly signers: AccountData.Signer[];
@@ -40,24 +38,9 @@ export namespace AccountData {
 		readonly publicKey: string;
 		readonly weight: number;
 	}
-
-	export interface Thresholds {
-		readonly lowThreshold: number;
-		readonly medThreshold: number;
-		readonly highThreshold: number;
-	}
 }
 
 export type Transaction = PaymentTransaction | CreateAccountTransaction | RawTransaction;
-
-export namespace Transaction {
-	export function decodeTransaction(params: DecodeTransactionParams): Transaction {
-		return TransactionRetriever.fromTransactionPayload(params.envelope, params.networkId) as PaymentTransaction | CreateAccountTransaction;
-	}
-	export function decodeRawTransaction(params: DecodeTransactionParams): RawTransaction {
-		return TransactionRetriever.fromTransactionPayload(params.envelope, params.networkId, false) as RawTransaction;
-	}
-}
 
 export interface TransactionBase {
 	type: "PaymentTransaction" | "CreateAccountTransaction" | "RawTransaction";

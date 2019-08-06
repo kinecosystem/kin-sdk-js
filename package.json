@@ -16,7 +16,7 @@
     "unit-test": "npm-run-all transpile transpile-tests jest-unit",
     "jest": "jest --forceExit --runInBand --detectOpenHandles --coverage '.*\\.test.*'",
     "jest-unit": "jest --forceExit --detectOpenHandles --coverage '.*\\.unit.test.*'",
-    "dev-server": "live-server ./public"
+    "dev-server": "http-server ./public -g"
   },
   "repository": {
     "type": "git",
@@ -40,11 +40,12 @@
     "@types/eventsource": "^1.1.0",
     "@types/jest": "^24.0.11",
     "@types/nock": "^9.3.1",
+    "compression-webpack-plugin": "^3.0.0",
     "eslint": "^6.1.0",
     "html-webpack-plugin": "^3.2.0",
+    "http-server": "^0.11.1",
     "jest": "^23.6.0",
     "jest-each": "^24.7.1",
-    "live-server": "^1.2.1",
     "nock": "^10.0.6",
     "npm-run-all": "^4.1.5",
     "prettier": "^1.18.2",

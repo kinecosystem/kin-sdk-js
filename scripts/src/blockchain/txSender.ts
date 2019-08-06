@@ -14,6 +14,7 @@ export class TxSender {
 		private readonly _server: Server,
 		private readonly _blockchainInfoRetriever: IBlockchainInfoRetriever
 	) {
+
 		this._keystoreProvider = _keystoreProvider;
 		this._appId = _appId;
 		this._server = _server;

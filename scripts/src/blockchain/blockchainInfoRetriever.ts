@@ -13,7 +13,7 @@ export class BlockchainInfoRetriever implements IBlockchainInfoRetriever {
 
 	public async getMinimumFee(): Promise<number> {
 		try {
-			const ledgers = await this._server.ledgers().order('desc').limit(1).call();
+			const ledgers = await this._server.ledgers().order("desc").limit(1).call();
 			return ledgers.records[0].base_fee_in_stroops;
 		} catch (e) {
 			throw ErrorDecoder.translate(e);
