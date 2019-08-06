@@ -1,6 +1,6 @@
 const path = require("path");
-const webpack = require("webpack");
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
   entry: {
@@ -26,10 +26,11 @@ module.exports = {
     extensions: [".ts", ".js"]
   },
   output: {
-    filename: "./[name].bundle.js",
+    filename: "./[name].bundle.[chunkhash:6].js",
     path: path.resolve(__dirname, "public")
   },
   plugins: [
+    // new CompressionPlugin(),
     new HtmlWebpackPlugin({
       filename: 'index.html'
     })
@@ -37,5 +38,6 @@ module.exports = {
   optimization: {
     removeAvailableModules: true,
     mergeDuplicateChunks: true,
+    usedExports: true
   }
 };

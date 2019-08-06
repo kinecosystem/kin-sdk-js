@@ -10,7 +10,6 @@ import { AccountDataRetriever } from "./blockchain/accountDataRetriever";
 import { Friendbot } from "./friendbot";
 import { BlockchainInfoRetriever } from "./blockchain/blockchainInfoRetriever";
 import { Address, TransactionId } from "./types/miscs";
-import { BlockchainListener } from "./blockchain/blockchainListeners";
 import { GLOBAL_RETRY } from "./config";
 
 export class KinClient {
@@ -19,7 +18,6 @@ export class KinClient {
 	private readonly _accountDataRetriever: AccountDataRetriever;
 	private readonly _friendbotHandler: Friendbot | undefined;
 	private readonly _blockchainInfoRetriever: BlockchainInfoRetriever;
-	private readonly _blockchainListener: BlockchainListener;
 	private _kinAccounts: KinAccount[] | null;
 
 	constructor(private readonly _environment: Environment, private readonly _keystoreProvider: KeystoreProvider, private readonly _appId?: string) {
@@ -29,7 +27,6 @@ export class KinClient {
 		this._accountDataRetriever = new AccountDataRetriever(this._server);
 		this._friendbotHandler = _environment.friendbotUrl ? new Friendbot(_environment.friendbotUrl, this._accountDataRetriever) : undefined;
 		this._blockchainInfoRetriever = new BlockchainInfoRetriever(this._server);
-		this._blockchainListener = new BlockchainListener(this._server);
 		this._kinAccounts = null;
 	}
 
@@ -56,14 +53,6 @@ export class KinClient {
 	 */
 	public getMinimumFee(): Promise<number> {
 		return this._blockchainInfoRetriever.getMinimumFee();
-	}
-
-	/**
-	 * Creates a payment listener for the given addresses.
-	 * @return PaymentListener listener object, call `close` to stop listener, `addAddress` to add additional address to listen to
-	 */
-	public createPaymentListener(params: PaymentListenerParams): PaymentListener {
-		return this._blockchainListener.createPaymentsListener(params.onPayment, params.addresses);
 	}
 
 	/**

@@ -1,6 +1,6 @@
 import {AssetType, Horizon, Server} from "@kinecosystem/kin-sdk";
 import {AccountData, Balance} from "./horizonModels";
-import {ErrorDecoder, KinSdkError} from "../errors"
+import {ErrorDecoder, KinSdkError} from "../errors";
 import {Utils} from "../utils";
 import {Address} from "..";
 import BalanceLineAsset = Horizon.BalanceLineAsset;
@@ -11,7 +11,7 @@ export interface IAccountDataRetriever {
 
 	fetchKinBalance(address: Address): Promise<Balance>;
 
-	isAccountExisting(address: Address): Promise<boolean>
+	isAccountExisting(address: Address): Promise<boolean>;
 }
 
 export class AccountDataRetriever implements IAccountDataRetriever {
@@ -31,11 +31,6 @@ export class AccountDataRetriever implements IAccountDataRetriever {
 				sequenceNumber: parseInt(accountResponse.sequenceNumber()),
 				pagingToken: accountResponse.paging_token,
 				subentryCount: accountResponse.subentry_count,
-				thresholds: {
-					highThreshold: accountResponse.thresholds.high_threshold,
-					medThreshold: accountResponse.thresholds.med_threshold,
-					lowThreshold: accountResponse.thresholds.low_threshold
-				},
 				signers: this.extractSigners(accountResponse),
 				data: accountResponse.data_attr,
 				balances: this.extractBalances(accountResponse),
@@ -43,7 +38,7 @@ export class AccountDataRetriever implements IAccountDataRetriever {
 					authRequired: accountResponse.flags.auth_required,
 					authRevocable: accountResponse.flags.auth_revocable
 				}
-			}
+			};
 		} catch (e) {
 			throw ErrorDecoder.translate(e);
 		}
@@ -52,7 +47,7 @@ export class AccountDataRetriever implements IAccountDataRetriever {
 	public async fetchKinBalance(address: string): Promise<Balance> {
 		let balance = 0;
 		const accountData = await this.fetchAccountData(address);
-		for (let accountBalance of accountData.balances) {
+		for (const accountBalance of accountData.balances) {
 			if (accountBalance.assetType === "native") {
 				balance = accountBalance.balance;
 				break;
@@ -76,21 +71,21 @@ export class AccountDataRetriever implements IAccountDataRetriever {
 
 	private extractSigners(accountResponse: Server.AccountResponse) {
 		const signers = new Array<AccountData.Signer>();
-		for (let account of accountResponse.signers) {
+		for (const account of accountResponse.signers) {
 			signers.push({
 				publicKey: account.public_key,
 				weight: account.weight
-			})
+			});
 		}
 		return signers;
 	}
 
 	private extractBalances(accountResponse: Server.AccountResponse) {
 		const balances = new Array<AccountData.Balance>();
-		for (let stellarBalance of accountResponse.balances) {
-			let assetCode: string | undefined = undefined;
-			let assetIssuer: string | undefined = undefined;
-			let limit: number | undefined = undefined;
+		for (const stellarBalance of accountResponse.balances) {
+			let assetCode: string | undefined;
+			let assetIssuer: string | undefined;
+			let limit: number | undefined;
 			if (this.isBalanceLineAsset(stellarBalance)) {
 				assetCode = stellarBalance.asset_code;
 				assetIssuer = stellarBalance.asset_issuer;
@@ -99,15 +94,15 @@ export class AccountDataRetriever implements IAccountDataRetriever {
 			balances.push({
 				assetType: stellarBalance.asset_type,
 				balance: parseFloat(stellarBalance.balance),
-				assetCode: assetCode,
-				assetIssuer: assetIssuer,
-				limit: limit
+				assetCode,
+				assetIssuer,
+				limit
 			});
 		}
 		return balances;
 	}
 
 	private isBalanceLineAsset(balanceLine: BalanceLine): balanceLine is BalanceLineAsset<AssetType.credit4> {
-		return (<BalanceLineAsset>balanceLine).asset_issuer !== undefined;
+		return (<BalanceLineAsset> balanceLine).asset_issuer !== undefined;
 	}
 }
