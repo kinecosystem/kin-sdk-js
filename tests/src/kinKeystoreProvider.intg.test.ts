@@ -17,7 +17,7 @@ describe("KinAccount", async () => {
 		expect(transactionId).toBeDefined();
 		expect(secondTransactionId).toBeDefined();
 
-		const txBuilder = await kinAccounts[0].buildSendKin({
+		const txBuilder = await kinAccounts[0].buildTransaction({
 			address: kinAccounts[1].publicAddress,
 			amount: 1,
 			fee: 100,
