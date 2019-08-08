@@ -1,12 +1,8 @@
-(async function() {
-	let kinClient;
-	let keyStoreProvider;
-	const KinSdk = window.KinSdk;
-
-	keyStoreProvider = new KinSdk.KeystoreProviders.SimpleKeystoreProvider();
+(async function(KinSdk, KeystoreProvider) {
+	let keyStoreProvider = new KeystoreProvider(KinSdk);
 	keyStoreProvider.addKeyPair();
 
-	kinClient = new KinSdk.KinClient(
+	let kinClient = new KinSdk.KinClient(
 		KinSdk.Environment.Testnet,
 		keyStoreProvider
 	);
@@ -28,10 +24,7 @@
 		fee: 100,
 		memoText: "Send some kin",
 	});
-	// const transactionString = toWhitelistableTransaction.toWhitelistableTransaction();
-	// console.log(transactionString);
 
-	// await accounts[0].sendWhitelistableTransaction(transactionString);
 	await accounts[0].submitTransaction(transaction);
 
 	const senderBalance = await accounts[0].getBalance();
@@ -39,4 +32,4 @@
 
 	console.log(senderBalance);
 	console.log(receiverBalance);
-})();
+})(window.KinSdk, window.KeystoreProvider);

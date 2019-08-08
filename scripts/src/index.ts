@@ -20,6 +20,7 @@ import {
 	Transaction
 } from "./blockchain/horizonModels";
 import { KeyPair } from "./blockchain/keyPair";
+import { Keypair as BaseKeyPair } from "@kinecosystem/kin-sdk";
 import {
 	AccountExistsError,
 	AccountNotActivatedError,
@@ -35,16 +36,17 @@ import {
 	NetworkError,
 	NetworkMismatchedError,
 	ResourceNotFoundError,
-	ServerError
+	ServerError,
 } from "./errors";
-
-import * as KeystoreProviders from "./keystoreProviders";
+import { Transaction as XdrTransaction } from "@kinecosystem/kin-sdk";
+import KeystoreProvider from "./blockchain/keystoreProvider";
 export {
-	KeystoreProviders,
+	KeystoreProvider,
 	KinClient,
 	KinAccount,
 	Environment,
 	Transaction,
+	XdrTransaction,
 	RawTransaction,
 	PaymentTransaction,
 	CreateAccountTransaction,
@@ -56,6 +58,7 @@ export {
 	Balance,
 	TransactionId,
 	KeyPair,
+	BaseKeyPair,
 	CreateKinAccountParams,
 	TransactionHistoryParams,
 	PaymentListenerParams,

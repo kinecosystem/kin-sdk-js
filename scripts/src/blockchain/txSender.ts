@@ -1,6 +1,5 @@
 import { Address, TransactionId } from "..";
-import { Asset, Operation, Server } from "@kinecosystem/kin-sdk";
-import { Transaction, xdr } from "@kinecosystem/kin-base";
+import { Asset, Operation, Server, Transaction, xdr, Network } from "@kinecosystem/kin-sdk";
 import { TransactionBuilder } from "./transactionBuilder";
 import { ErrorDecoder } from "../errors";
 import { IBlockchainInfoRetriever } from "./blockchainInfoRetriever";
@@ -65,17 +64,11 @@ export class TxSender {
 		return builder;
 	}
 
-	public async sendWhitelistableTransaction(transaction: string): Promise<TransactionId> {
+	public async submitTransaction(transactionString: string): Promise<TransactionId> {
 		try {
-			const transactionEnvelope = xdr.TransactionEnvelope.fromXDR(new Buffer(transaction, "base64"));
-			const xdrTransaction = new Transaction(transactionEnvelope);
-			const signedXdrTransaction = await this._keystoreProvider.signTransaction(
-				this._publicAddress,
-				xdrTransaction
-			);
-			const transactionResponse = await this._server.submitTransaction(
-				signedXdrTransaction
-			);
+			const signedTransactionString = await this._keystoreProvider.signTransaction(this._publicAddress, transactionString);
+			const signedTransaction = new Transaction(signedTransactionString);
+			const transactionResponse = await this._server.submitTransaction(signedTransaction);
 			return transactionResponse.hash;
 		} catch (e) {
 			const error = ErrorDecoder.translate(e);
@@ -83,29 +76,28 @@ export class TxSender {
 		}
 	}
 
-	public async submitTransaction(transaction: TransactionBuilder | Transaction): Promise<TransactionId> {
-		try {
-			let xdrTransaction;
-			if (transaction instanceof TransactionBuilder) {
-				xdrTransaction = transaction.build();
-			} else if (transaction instanceof Transaction) {
-				xdrTransaction = transaction;
-			} else {
-				throw new Error("submitTransaction type mismatch");
-			}
-			const signedXdrTransaction = await this._keystoreProvider.signTransaction(
-				this._publicAddress,
-				xdrTransaction
-			);
-			const transactionResponse = await this._server.submitTransaction(
-				signedXdrTransaction
-			);
-			return transactionResponse.hash;
-		} catch (e) {
-			const error = ErrorDecoder.translate(e);
-			throw error;
-		}
-	}
+	// public async submitTransaction2(transaction: Transaction): Promise<TransactionId> {
+	// 	try {
+	// 		let xdrTransaction;
+	// 		if (transaction instanceof TransactionBuilder) {
+	// 			xdrTransaction = transaction.build();
+	// 		} else if (transaction instanceof Transaction) {
+	// 			xdrTransaction = transaction;
+	// 		} else {
+	// 			throw new Error("submitTransaction type mismatch");
+	// 		}
+	// 		const signedXdrTransaction = await this._keystoreProvider.signTransaction(
+	// 			this._publicAddress,xdrTransaction
+	// 		);
+	// 		const transactionResponse = await this._server.submitTransaction(
+	// 			signedXdrTransaction
+	// 		);
+	// 		return transactionResponse.hash;
+	// 	} catch (e) {
+	// 		const error = ErrorDecoder.translate(e);
+	// 		throw error;
+	// 	}
+	// }
 
 	private async loadSenderAccountData() {
 		const response: Server.AccountResponse = await this._server.loadAccount(

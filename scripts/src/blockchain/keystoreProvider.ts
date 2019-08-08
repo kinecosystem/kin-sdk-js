@@ -3,8 +3,5 @@ import { Address } from "..";
 
 export default interface KeystoreProvider {
 	accounts: Promise<Address[]>;
-	signTransaction(
-		accountAddress: Address,
-		xdrTransaction: Transaction
-	): Promise<Transaction>;
+	signTransaction(accountAddress: Address, xdrTransaction: string): Promise<string>;
 }

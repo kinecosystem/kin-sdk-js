@@ -5,5 +5,4 @@ declare global {
 		KinSdk: typeof KinSdk;
 	}
 }
-
 window.KinSdk = KinSdk;
