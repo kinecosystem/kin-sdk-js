@@ -31,6 +31,11 @@ export class AccountDataRetriever implements IAccountDataRetriever {
 				sequenceNumber: parseInt(accountResponse.sequenceNumber()),
 				pagingToken: accountResponse.paging_token,
 				subentryCount: accountResponse.subentry_count,
+				thresholds: {
+					highThreshold: accountResponse.thresholds.high_threshold,
+					medThreshold: accountResponse.thresholds.med_threshold,
+					lowThreshold: accountResponse.thresholds.low_threshold
+				},
 				signers: this.extractSigners(accountResponse),
 				data: accountResponse.data_attr,
 				balances: this.extractBalances(accountResponse),
