@@ -7,7 +7,6 @@ import {
 } from "./kinClient";
 import { CreateAccountParams, GetTransactionParams, KinAccount, SendKinParams } from "./kinAccount";
 import { Environment } from "./environment";
-import { Address, TransactionId, WhitelistPayload } from "./types/miscs";
 import {
 	AccountData,
 	AssetType,
@@ -20,6 +19,7 @@ import {
 	Transaction
 } from "./blockchain/horizonModels";
 import { KeyPair } from "./blockchain/keyPair";
+import { Keypair as BaseKeyPair } from "@kinecosystem/kin-sdk";
 import {
 	AccountExistsError,
 	AccountNotActivatedError,
@@ -35,16 +35,15 @@ import {
 	NetworkError,
 	NetworkMismatchedError,
 	ResourceNotFoundError,
-	ServerError
+	ServerError,
 } from "./errors";
-
-import * as KeystoreProviders from "./keystoreProviders";
+import { Transaction as XdrTransaction } from "@kinecosystem/kin-sdk";
 export {
-	KeystoreProviders,
 	KinClient,
 	KinAccount,
 	Environment,
 	Transaction,
+	XdrTransaction,
 	RawTransaction,
 	PaymentTransaction,
 	CreateAccountTransaction,
@@ -52,10 +51,9 @@ export {
 	OnPaymentListener,
 	PaymentListener,
 	AssetType,
-	Address,
 	Balance,
-	TransactionId,
 	KeyPair,
+	BaseKeyPair,
 	CreateKinAccountParams,
 	TransactionHistoryParams,
 	PaymentListenerParams,
@@ -63,7 +61,6 @@ export {
 	GetTransactionParams,
 	CreateAccountParams,
 	SendKinParams,
-	WhitelistPayload,
 	KinSdkError,
 	NetworkError,
 	ServerError,

@@ -4,8 +4,7 @@ const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
   entry: {
-    "kin-sdk-web": __dirname + "/scripts/src/web/sdk.ts",
-    app: __dirname + "/scripts/src/web/app.ts"
+    "kin-sdk-web": __dirname + "/scripts/src/sdk.ts"
   },
   target: 'web',
   module: {
@@ -26,18 +25,15 @@ module.exports = {
     extensions: [".ts", ".js"]
   },
   output: {
-    filename: "./[name].bundle.[chunkhash:6].js",
+    filename: "./[name].js",
     path: path.resolve(__dirname, "public")
   },
   plugins: [
     // new CompressionPlugin(),
     new HtmlWebpackPlugin({
-      filename: 'index.html'
+      template: './public/template.html',
+      filename: './index.html',
+      inject: 'head'
     })
   ],
-  optimization: {
-    removeAvailableModules: true,
-    mergeDuplicateChunks: true,
-    usedExports: true
-  }
 };
