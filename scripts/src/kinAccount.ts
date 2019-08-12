@@ -2,7 +2,7 @@ import { AccountData, Balance } from "./blockchain/horizonModels";
 import { Server } from "@kinecosystem/kin-sdk";
 import { AccountDataRetriever } from "./blockchain/accountDataRetriever";
 import { TxSender } from "./blockchain/txSender";
-import { Address, TransactionId } from "./types/miscs";
+import { Address, TransactionId } from "./types";
 import * as config from "./config";
 import { TransactionBuilder } from "./blockchain/transactionBuilder";
 import { IBlockchainInfoRetriever } from "./blockchain/blockchainInfoRetriever";
@@ -49,11 +49,7 @@ export class KinAccount {
 	}
 
 	public async submitTransaction(transactionBuilder: TransactionBuilder): Promise<TransactionId> {
-		return await this._txSender.submitTransaction(transactionBuilder.build());
-	}
-
-	public async sendWhitelistableTransaction(transaction: string): Promise<string> {
-		return await this._txSender.sendWhitelistableTransaction(transaction);
+		return await this._txSender.submitTransaction(transactionBuilder.build().toEnvelope().toXDR("base64").toString());
 	}
 
 	/**

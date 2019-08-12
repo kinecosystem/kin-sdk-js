@@ -1,5 +1,5 @@
 import {Keypair} from "@kinecosystem/kin-sdk";
-import {Address} from "..";
+import {Address} from "../types";
 import * as crypto from "crypto";
 
 export class KeyPair {

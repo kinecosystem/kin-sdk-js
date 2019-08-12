@@ -8,7 +8,7 @@ import {
 } from "./blockchain/errors";
 
 class ErrorUtils {
-	static getTransaction(errorBody: any): string | undefined {
+	public static getTransaction(errorBody: any): string | undefined {
 		if (errorBody && errorBody.extras && errorBody.extras.result_codes.transaction) {
 			return errorBody.extras.result_codes.transaction;
 		}
@@ -16,7 +16,7 @@ class ErrorUtils {
 		return undefined;
 	}
 
-	static getOperations(errorBody: any): string[] | undefined {
+	public static getOperations(errorBody: any): string[] | undefined {
 		if (errorBody && errorBody.extras && errorBody.extras.result_codes.operations) {
 			return errorBody.extras.result_codes.operations;
 		}
@@ -26,47 +26,34 @@ class ErrorUtils {
 }
 
 export interface ErrorResponse {
-	type: string,
-	title: string,
-	status: number,
-	detail?: string,
-	extras?: any
+	type: string;
+	title: string;
+	status: number;
+	detail?: string;
+	extras?: any;
 }
 
 export type ErrorType =
-	'AccountNotFoundError'
-	| 'NetworkError'
-	| 'ServerError'
-	| 'FriendbotError'
-	| 'InvalidAddressError'
-	| 'NetworkMismatchedError'
-	| 'InvalidDataError'
-	| 'BadRequestError'
-	| 'InternalError'
-	| 'AccountExistsError'
-	| 'LowBalanceError'
-	| 'AccountNotActivatedError'
-	| 'HorizonError'
-	| 'ResourceNotFoundError';
+	"AccountNotFoundError"
+	| "NetworkError"
+	| "ServerError"
+	| "FriendbotError"
+	| "InvalidAddressError"
+	| "NetworkMismatchedError"
+	| "InvalidDataError"
+	| "BadRequestError"
+	| "InternalError"
+	| "AccountExistsError"
+	| "LowBalanceError"
+	| "AccountNotActivatedError"
+	| "HorizonError"
+	| "ResourceNotFoundError";
 
 export interface KinSdkError extends Error {
 	readonly type: ErrorType;
 }
 
 export class HorizonError extends Error implements KinSdkError {
-	readonly type: ErrorType = 'HorizonError';
-
-	private readonly _resultTransactionCode?: string;
-	private readonly _resultOperationsCode?: string[];
-	readonly errorCode: number;
-
-	constructor(readonly msg: string, readonly errorBody: ErrorResponse, readonly title?: string) {
-		super(`${msg}, error code: ${errorBody.status} ` + ((title ? `title: ${errorBody.title}` : "")));
-		this.errorCode = errorBody.status;
-		this.errorBody = errorBody;
-		this._resultTransactionCode = ErrorUtils.getTransaction(errorBody);
-		this._resultOperationsCode = ErrorUtils.getOperations(errorBody);
-	}
 
 	public get resultTransactionCode(): string | undefined {
 		return this._resultTransactionCode;
@@ -75,12 +62,25 @@ export class HorizonError extends Error implements KinSdkError {
 	public get resultOperationsCode(): string[] | undefined {
 		return this._resultOperationsCode;
 	}
+	public readonly type: ErrorType = "HorizonError";
+	public readonly errorCode: number;
+
+	private readonly _resultTransactionCode?: string;
+	private readonly _resultOperationsCode?: string[];
+
+	constructor(readonly msg: string, readonly errorBody: ErrorResponse, readonly title?: string) {
+		super(`${msg}, error code: ${errorBody.status} ` + ((title ? `title: ${errorBody.title}` : "")));
+		this.errorCode = errorBody.status;
+		this.errorBody = errorBody;
+		this._resultTransactionCode = ErrorUtils.getTransaction(errorBody);
+		this._resultOperationsCode = ErrorUtils.getOperations(errorBody);
+	}
 }
 
 export class AccountNotFoundError extends HorizonError {
 
-	readonly errorCode: number;
-	readonly type: ErrorType = 'AccountNotFoundError';
+	public readonly errorCode: number;
+	public readonly type: ErrorType = "AccountNotFoundError";
 
 	constructor(readonly errorBody: ErrorResponse, readonly title?: string) {
 		super(`Account was not found in the network.`, errorBody, title);
@@ -89,7 +89,7 @@ export class AccountNotFoundError extends HorizonError {
 }
 
 export class NetworkError extends Error implements KinSdkError {
-	readonly type = 'NetworkError';
+	public readonly type = "NetworkError";
 
 	constructor(readonly error: any) {
 		super( error && error.message ? error.message : `Network error occurred`);
@@ -98,7 +98,7 @@ export class NetworkError extends Error implements KinSdkError {
 }
 
 export class NetworkMismatchedError extends Error implements KinSdkError {
-	readonly type = 'NetworkMismatchedError';
+	public readonly type = "NetworkMismatchedError";
 
 	constructor(message: string) {
 		super(message);
@@ -106,7 +106,7 @@ export class NetworkMismatchedError extends Error implements KinSdkError {
 }
 
 export class InvalidDataError extends Error implements KinSdkError {
-	readonly type = 'InvalidDataError';
+	public readonly type = "InvalidDataError";
 
 	constructor() {
 		super(`Unable to sign whitelist transaction, invalid data`);
@@ -114,7 +114,7 @@ export class InvalidDataError extends Error implements KinSdkError {
 }
 
 export class ServerError extends HorizonError {
-	readonly type: ErrorType = 'ServerError';
+	public readonly type: ErrorType = "ServerError";
 
 	constructor(readonly errorBody: any) {
 		super(`Server error`, errorBody);
@@ -122,7 +122,7 @@ export class ServerError extends HorizonError {
 }
 
 export class FriendbotError extends Error implements KinSdkError {
-	readonly type: ErrorType = 'FriendbotError';
+	public readonly type: ErrorType = "FriendbotError";
 
 	constructor(readonly errorCode?: number, readonly extra?: any, readonly msg?: string) {
 		super(`Friendbot error, ` + (errorCode ? `error code: ${errorCode} ` : "") + (msg ? `msg: ${msg}` : ""));
@@ -132,15 +132,15 @@ export class FriendbotError extends Error implements KinSdkError {
 }
 
 export class InvalidAddressError extends Error implements KinSdkError {
-	readonly type: ErrorType = 'InvalidAddressError';
+	public readonly type: ErrorType = "InvalidAddressError";
 
 	constructor() {
-		super('Invalid wallet address.');
+		super("Invalid wallet address.");
 	}
 }
 
 export class BadRequestError extends HorizonError {
-	readonly type: ErrorType = 'BadRequestError';
+	public readonly type: ErrorType = "BadRequestError";
 
 	constructor(readonly errorBody: ErrorResponse, readonly title?: string) {
 		super(`Bad Request error`, errorBody, title);
@@ -148,7 +148,7 @@ export class BadRequestError extends HorizonError {
 }
 
 export class InternalError extends HorizonError {
-	readonly type: ErrorType = 'InternalError';
+	public readonly type: ErrorType = "InternalError";
 
 	constructor(readonly errorBody: any, readonly title?: string) {
 		super(`Internal error`, errorBody, title ? title : "{'internal_error': 'unknown horizon error'}");
@@ -156,7 +156,7 @@ export class InternalError extends HorizonError {
 }
 
 export class AccountExistsError extends HorizonError {
-	readonly type: ErrorType = 'AccountExistsError';
+	public readonly type: ErrorType = "AccountExistsError";
 
 	constructor(readonly errorBody: any, readonly title?: string) {
 		super(`Account already exists`, errorBody, title);
@@ -164,7 +164,7 @@ export class AccountExistsError extends HorizonError {
 }
 
 export class LowBalanceError extends HorizonError {
-	readonly type: ErrorType = 'LowBalanceError';
+	public readonly type: ErrorType = "LowBalanceError";
 
 	constructor(readonly errorBody: ErrorResponse, readonly title?: string) {
 		super(`Low balance`, errorBody, title);
@@ -172,7 +172,7 @@ export class LowBalanceError extends HorizonError {
 }
 
 export class AccountNotActivatedError extends HorizonError {
-	readonly type: ErrorType = 'AccountNotActivatedError';
+	public readonly type: ErrorType = "AccountNotActivatedError";
 
 	constructor(readonly errorBody: ErrorResponse, readonly title?: string) {
 		super(`Account not activated`, errorBody, title);
@@ -180,7 +180,7 @@ export class AccountNotActivatedError extends HorizonError {
 }
 
 export class ResourceNotFoundError extends HorizonError {
-	readonly type: ErrorType = 'ResourceNotFoundError';
+	public readonly type: ErrorType = "ResourceNotFoundError";
 
 	constructor(readonly errorBody: ErrorResponse, readonly title?: string) {
 		super(`Resources not found`, errorBody, title);
@@ -211,14 +211,14 @@ export class ErrorDecoder {
 		return new NetworkError(errorBody);
 	}
 
-	static translateOperationError(errorCode: number, errorBody?: any): HorizonError {
+	public static translateOperationError(errorCode: number, errorBody?: any): HorizonError {
 		let resultCode;
 		const resultOperationsCode = ErrorUtils.getOperations(errorBody);
 		if (resultOperationsCode === undefined || !resultOperationsCode.length) {
 			return new InternalError(errorBody);
 		}
 
-		for (let entry of resultOperationsCode) {
+		for (const entry of resultOperationsCode) {
 			if (entry !== OperationResultCode.SUCCESS) {
 				resultCode = entry;
 				break;
@@ -250,7 +250,7 @@ export class ErrorDecoder {
 		return new InternalError(errorBody);
 	}
 
-	static translateTransactionError(errorCode: number, errorBody?: any): HorizonError {
+	public static translateTransactionError(errorCode: number, errorBody?: any): HorizonError {
 		const resultTransactionCode = ErrorUtils.getTransaction(errorBody);
 		if (resultTransactionCode === TransactionErrorList.FAILED) {
 			return this.translateOperationError(errorCode, errorBody);
@@ -265,7 +265,7 @@ export class ErrorDecoder {
 		return new InternalError(errorBody);
 	}
 
-	static translateHorizonError(errorCode: number, errorBody?: any): HorizonError {
+	public static translateHorizonError(errorCode: number, errorBody?: any): HorizonError {
 		if (this.includesObject(errorBody.type, [HorizonErrorList.RATE_LIMIT_EXCEEDED, HorizonErrorList.SERVER_OVER_CAPACITY, HorizonErrorList.TIMEOUT])) {
 			return new ServerError(errorBody);
 		} else if (this.includesObject(errorBody.type, [HorizonErrorList.NOT_FOUND])) {
@@ -278,8 +278,8 @@ export class ErrorDecoder {
 		return new InternalError(errorCode);
 	}
 
-	static includesObject(type: string, list: string[]): boolean {
-		for (let entry of list) {
+	public static includesObject(type: string, list: string[]): boolean {
+		for (const entry of list) {
 			if (type.includes(entry)) {
 				return true;
 			}

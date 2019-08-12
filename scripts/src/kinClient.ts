@@ -9,7 +9,7 @@ import { Network, Server } from "@kinecosystem/kin-sdk";
 import { AccountDataRetriever } from "./blockchain/accountDataRetriever";
 import { Friendbot } from "./friendbot";
 import { BlockchainInfoRetriever } from "./blockchain/blockchainInfoRetriever";
-import { Address, TransactionId } from "./types/miscs";
+import { Address, TransactionId } from "./types";
 import { GLOBAL_HEADERS, GLOBAL_RETRY } from "./config";
 
 export class KinClient {
