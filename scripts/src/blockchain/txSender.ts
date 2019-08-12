@@ -76,29 +76,6 @@ export class TxSender {
 		}
 	}
 
-	// public async submitTransaction2(transaction: Transaction): Promise<TransactionId> {
-	// 	try {
-	// 		let xdrTransaction;
-	// 		if (transaction instanceof TransactionBuilder) {
-	// 			xdrTransaction = transaction.build();
-	// 		} else if (transaction instanceof Transaction) {
-	// 			xdrTransaction = transaction;
-	// 		} else {
-	// 			throw new Error("submitTransaction type mismatch");
-	// 		}
-	// 		const signedXdrTransaction = await this._keystoreProvider.signTransaction(
-	// 			this._publicAddress,xdrTransaction
-	// 		);
-	// 		const transactionResponse = await this._server.submitTransaction(
-	// 			signedXdrTransaction
-	// 		);
-	// 		return transactionResponse.hash;
-	// 	} catch (e) {
-	// 		const error = ErrorDecoder.translate(e);
-	// 		throw error;
-	// 	}
-	// }
-
 	private async loadSenderAccountData() {
 		const response: Server.AccountResponse = await this._server.loadAccount(
 			this._publicAddress

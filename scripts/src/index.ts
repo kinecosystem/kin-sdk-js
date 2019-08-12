@@ -7,7 +7,6 @@ import {
 } from "./kinClient";
 import { CreateAccountParams, GetTransactionParams, KinAccount, SendKinParams } from "./kinAccount";
 import { Environment } from "./environment";
-import { Address, TransactionId, WhitelistPayload } from "./types/miscs";
 import {
 	AccountData,
 	AssetType,
@@ -39,9 +38,7 @@ import {
 	ServerError,
 } from "./errors";
 import { Transaction as XdrTransaction } from "@kinecosystem/kin-sdk";
-import KeystoreProvider from "./blockchain/keystoreProvider";
 export {
-	KeystoreProvider,
 	KinClient,
 	KinAccount,
 	Environment,
