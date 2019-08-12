@@ -83,19 +83,11 @@ export class TxSender {
 		}
 	}
 
-	public async submitTransaction(transaction: TransactionBuilder | Transaction): Promise<TransactionId> {
+	public async submitTransaction(transaction: Transaction): Promise<TransactionId> {
 		try {
-			let xdrTransaction;
-			if (transaction instanceof TransactionBuilder) {
-				xdrTransaction = transaction.build();
-			} else if (transaction instanceof Transaction) {
-				xdrTransaction = transaction;
-			} else {
-				throw new Error("submitTransaction type mismatch");
-			}
 			const signedXdrTransaction = await this._keystoreProvider.signTransaction(
 				this._publicAddress,
-				xdrTransaction
+				transaction
 			);
 			const transactionResponse = await this._server.submitTransaction(
 				signedXdrTransaction

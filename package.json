@@ -1,7 +1,7 @@
 {
-  "name": "@kinecosystem/kin-sdk-node",
-  "version": "0.9.3",
-  "description": "Kin SDK for the Node runtime",
+  "name": "@kinecosystem/kin-sdk-web",
+  "version": "0.1.0",
+  "description": "Kin SDK web javascript/typescript client",
   "main": "scripts/bin/web/sdk.ts",
   "types": "scripts/bin/index.d.ts",
   "scripts": {
@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kinecosystem/kin-sdk-node.git"
+    "url": "git+https://github.com/kinecosystem/kin-sdk-web.git"
   },
   "keywords": [
     "typescript",
@@ -33,9 +33,9 @@
   "author": "Kin Ecosystem",
   "license": "Kin Ecosystem SDK License",
   "bugs": {
-    "url": "https://github.com/kinecosystem/kin-sdk-node/issues"
+    "url": "https://github.com/kinecosystem/kin-sdk-web/issues"
   },
-  "homepage": "https://github.com/kinecosystem/kin-sdk-node",
+  "homepage": "https://github.com/kinecosystem/kin-sdk-web",
   "devDependencies": {
     "@types/eventsource": "^1.1.0",
     "@types/jest": "^24.0.11",

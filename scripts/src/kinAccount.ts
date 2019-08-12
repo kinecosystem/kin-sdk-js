@@ -49,7 +49,7 @@ export class KinAccount {
 	}
 
 	public async submitTransaction(transactionBuilder: TransactionBuilder): Promise<TransactionId> {
-		return await this._txSender.submitTransaction(transactionBuilder);
+		return await this._txSender.submitTransaction(transactionBuilder.build());
 	}
 
 	public async sendWhitelistableTransaction(transaction: string): Promise<string> {
