@@ -4,7 +4,7 @@ const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
   entry: {
-    "kin-sdk-web": __dirname + "/scripts/src/web/sdk.ts"
+    "kin-sdk-web": __dirname + "/scripts/src/sdk.ts"
   },
   target: 'web',
   module: {
