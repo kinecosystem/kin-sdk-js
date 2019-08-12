@@ -66,37 +66,9 @@ export class TxSender {
 
 	public async submitTransaction(transactionString: string): Promise<TransactionId> {
 		try {
-<<<<<<< HEAD
 			const signedTransactionString = await this._keystoreProvider.signTransaction(this._publicAddress, transactionString);
 			const signedTransaction = new Transaction(signedTransactionString);
 			const transactionResponse = await this._server.submitTransaction(signedTransaction);
-=======
-			const transactionEnvelope = xdr.TransactionEnvelope.fromXDR(new Buffer(transaction, "base64"));
-			const xdrTransaction = new Transaction(transactionEnvelope);
-			const signedXdrTransaction = await this._keystoreProvider.signTransaction(
-				this._publicAddress,
-				xdrTransaction
-			);
-			const transactionResponse = await this._server.submitTransaction(
-				signedXdrTransaction
-			);
-			return transactionResponse.hash;
-		} catch (e) {
-			const error = ErrorDecoder.translate(e);
-			throw error;
-		}
-	}
-
-	public async submitTransaction(transaction: Transaction): Promise<TransactionId> {
-		try {
-			const signedXdrTransaction = await this._keystoreProvider.signTransaction(
-				this._publicAddress,
-				transaction
-			);
-			const transactionResponse = await this._server.submitTransaction(
-				signedXdrTransaction
-			);
->>>>>>> master
 			return transactionResponse.hash;
 		} catch (e) {
 			const error = ErrorDecoder.translate(e);
