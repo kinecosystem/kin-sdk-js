@@ -11,6 +11,7 @@ export interface AccountData {
 	readonly sequenceNumber: number;
 	readonly pagingToken: string;
 	readonly subentryCount: number;
+	readonly thresholds: AccountData.Thresholds;
 	readonly flags: AccountData.Flags;
 	readonly balances: AccountData.Balance[];
 	readonly signers: AccountData.Signer[];
@@ -37,6 +38,12 @@ export namespace AccountData {
 	export interface Signer {
 		readonly publicKey: string;
 		readonly weight: number;
+	}
+
+	export interface Thresholds {
+		readonly lowThreshold: number;
+		readonly medThreshold: number;
+		readonly highThreshold: number;
 	}
 }
 
