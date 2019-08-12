@@ -18,6 +18,7 @@ import {
 	RawTransaction,
 	Transaction
 } from "./blockchain/horizonModels";
+import KeystoreProvider from "./blockchain/keystoreProvider";
 import { KeyPair } from "./blockchain/keyPair";
 import { Keypair as BaseKeyPair } from "@kinecosystem/kin-sdk";
 import {
@@ -39,6 +40,7 @@ import {
 } from "./errors";
 import { Transaction as XdrTransaction } from "@kinecosystem/kin-sdk";
 export {
+	KeystoreProvider,
 	KinClient,
 	KinAccount,
 	Environment,
