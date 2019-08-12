@@ -1,6 +1,6 @@
 {
   "name": "@kinecosystem/kin-sdk-web",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Kin SDK web javascript/typescript client",
   "main": "scripts/bin/web/sdk.ts",
   "types": "scripts/bin/index.d.ts",
@@ -42,7 +42,7 @@
     "@types/nock": "^9.3.1",
     "compression-webpack-plugin": "^3.0.0",
     "eslint": "^6.1.0",
-    "html-webpack-plugin": "^3.2.0",
+    "exports-loader": "^0.7.0",
     "http-server": "^0.11.1",
     "jest": "^23.6.0",
     "jest-each": "^24.7.1",
