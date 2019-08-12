@@ -2,7 +2,7 @@ import {AssetType, Horizon, Server} from "@kinecosystem/kin-sdk";
 import {AccountData, Balance} from "./horizonModels";
 import {ErrorDecoder, KinSdkError} from "../errors";
 import {Utils} from "../utils";
-import {Address} from "..";
+import {Address} from "../types";
 import BalanceLineAsset = Horizon.BalanceLineAsset;
 import BalanceLine = Horizon.BalanceLine;
 

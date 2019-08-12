@@ -1,8 +1,11 @@
-import { KinClient,
+import {
+	KinClient,
 	Environment,
 	XdrTransaction,
 	BaseKeyPair,
 	KeyPair } from ".";
+
+import KeystoreProvider from "./blockchain/keystoreProvider";
 
 const kinSdk = {
 	KinClient,
@@ -15,6 +18,8 @@ const kinSdk = {
 declare global {
 	interface Window {
 		KinSdk: typeof kinSdk;
+		KeystoreProvider?: KeystoreProvider;
 	}
 }
+
 window.KinSdk = kinSdk;

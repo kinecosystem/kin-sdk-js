@@ -1,4 +1,4 @@
-import { Address, TransactionId } from "..";
+import { Address, TransactionId } from "../types";
 import { Asset, Operation, Server, Transaction, xdr, Network } from "@kinecosystem/kin-sdk";
 import { TransactionBuilder } from "./transactionBuilder";
 import { ErrorDecoder } from "../errors";

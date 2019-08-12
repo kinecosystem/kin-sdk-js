@@ -1,5 +1,4 @@
-import { Transaction } from "@kinecosystem/kin-sdk";
-import { Address } from "..";
+import { Address } from "../types";
 
 export default interface KeystoreProvider {
 	accounts: Promise<Address[]>;
