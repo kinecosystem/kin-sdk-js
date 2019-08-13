@@ -4,7 +4,7 @@
 		"outDir": "bin",
 		"target": "es6",
 		"module": "commonjs",
-		"lib": ["DOM", "es5", "es6"],
+		"lib": ["dom", "es5", "es6"],
 
 		"strict": true,
 		"sourceMap": true,
