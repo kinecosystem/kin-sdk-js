@@ -66,7 +66,7 @@ export class TxSender {
 
 	public async submitTransaction(transactionString: string): Promise<TransactionId> {
 		try {
-			const signedTransactionString = await this._keystoreProvider.signTransaction(this._publicAddress, transactionString);
+			const signedTransactionString = await this._keystoreProvider.sign(this._publicAddress, transactionString);
 			const signedTransaction = new Transaction(signedTransactionString);
 			const transactionResponse = await this._server.submitTransaction(signedTransaction);
 			return transactionResponse.hash;
