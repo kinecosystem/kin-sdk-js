@@ -73,6 +73,10 @@ export class TransactionBuilder {
 		return this._transactionBuilder.build();
 	}
 
+	public toString(): string {
+		return this.build().toEnvelope().toXDR("base64").toString();
+	}
+
 	public toWhitelistableTransaction(): string {
 		return this.build().toEnvelope().toXDR().toString("base64");
 	}

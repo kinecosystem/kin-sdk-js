@@ -48,8 +48,8 @@ export class KinAccount {
 		return await this._txSender.buildTransaction(params.address, params.amount, params.fee, params.memoText);
 	}
 
-	public async submitTransaction(transactionBuilder: TransactionBuilder): Promise<TransactionId> {
-		return await this._txSender.submitTransaction(transactionBuilder.build().toEnvelope().toXDR("base64").toString());
+	public async submitTransaction(transaction: string): Promise<TransactionId> {
+		return await this._txSender.submitTransaction(transaction);
 	}
 
 	/**

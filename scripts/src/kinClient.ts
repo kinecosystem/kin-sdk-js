@@ -20,8 +20,7 @@ export class KinClient {
 	private readonly _blockchainInfoRetriever: BlockchainInfoRetriever;
 	private _kinAccounts: KinAccount[] | null;
 
-	constructor(private readonly _environment: Environment, private readonly _keystoreProvider: KeystoreProvider, private readonly _appId?: string) {
-		this._environment = _environment;
+	constructor(private readonly _environment: Environment,  readonly keystoreProvider: KeystoreProvider, private readonly _appId?: string) {
 		this._server = new Server(_environment.url, { allowHttp: false, headers: GLOBAL_HEADERS,  retry: GLOBAL_RETRY });
 		Network.use(new Network(_environment.passphrase));
 		this._accountDataRetriever = new AccountDataRetriever(this._server);
@@ -35,8 +34,8 @@ export class KinClient {
 			return Promise.resolve(this._kinAccounts);
 		} else {
 			return new Promise(resolve => {
-				this._keystoreProvider.accounts.then(accounts => {
-					resolve(accounts.map(account => new KinAccount(account, this._keystoreProvider,
+				this.keystoreProvider.accounts.then(accounts => {
+					resolve(accounts.map(account => new KinAccount(account, this.keystoreProvider,
 						this._accountDataRetriever, this._server, this._blockchainInfoRetriever, this._appId)));
 				});
 			});
