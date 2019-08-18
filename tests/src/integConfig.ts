@@ -1,8 +1,8 @@
 import {Environment} from "../../scripts/src";
 
-export const INTEG_ENV = getIntegEnv();
+export const INTEG_ENV: Environment = getIntegEnv();
 
-function getIntegEnv() {
+function getIntegEnv(): Environment {
 	const envUrl = process.env.INTEG_TESTS_NETWORK_URL;
 	const envFriendbot = process.env.INTEG_TESTS_NETWORK_FRIENDBOT;
 	const envPassphrase = process.env.INTEG_TESTS_NETWORK_PASSPHRASE;

@@ -1,7 +1,7 @@
 import {IAccountDataRetriever} from "../../scripts/src/blockchain/accountDataRetriever";
 import {Friendbot} from "../../scripts/src/friendbot";
 import * as nock from "nock";
-import {FriendbotError, InvalidAddressError, NetworkError} from "../../scripts/src";
+import {FriendbotError, InvalidAddressError, NetworkError} from "../../scripts/src/errors";
 
 const fakeUrl = "http://horizon.com";
 const publicAddress = "GDAVCZIOYRGV74ROE344CMRLPZYSZVRHNTRFGOUSAQBILJ7M5ES25KOZ";
@@ -31,7 +31,7 @@ describe("Friendbot.createOrFund", async () => {
 			.rejects.toEqual(new InvalidAddressError());
 	});
 
-	test('account not exist, should create', async () => {
+	test("account not exist, should create", async () => {
 		nock(fakeUrl)
 			.get(url => url.includes(publicAddress) && !url.includes("fund"))
 			.reply(200,
@@ -53,7 +53,7 @@ describe("Friendbot.createOrFund", async () => {
 		expect(await friendBot.createOrFund(publicAddress, 30)).toEqual("8da527ef4e20d29c88e9a839c444f0e0b8d2563e0ef9367a4fb3e6287eab3a26");
 	});
 
-	test('account exist, should fund', async () => {
+	test("account exist, should fund", async () => {
 		nock(fakeUrl)
 			.get(url => url.includes(publicAddress) && url.includes("fund"))
 			.reply(200,
@@ -75,7 +75,7 @@ describe("Friendbot.createOrFund", async () => {
 		expect(await friendBot.createOrFund(publicAddress, 30)).toEqual("8da527ef4e20d29c88e9a839c444f0e0b8d2563e0ef9367a4fb3e6287eab3a26");
 	});
 
-	test('account exist, server error', async () => {
+	test("account exist, server error", async () => {
 		const errorResponseData = {
 			"type": "https://stellar.org/horizon-errors/bad_request",
 			"title": "Bad Request",
@@ -97,7 +97,7 @@ describe("Friendbot.createOrFund", async () => {
 	});
 
 	test("timeout error, expect NetworkError", async () => {
-		const errorResponseData = {code: 'ETIMEDOUT'};
+		const errorResponseData = {code: "ETIMEDOUT"};
 		nock(fakeUrl)
 			.get(url => url.includes(publicAddress))
 			.replyWithError(errorResponseData);
@@ -106,6 +106,5 @@ describe("Friendbot.createOrFund", async () => {
 		await expect(friendBot.createOrFund(publicAddress, 30))
 			.rejects.toEqual(new NetworkError(errorResponseData));
 	});
-
 
 });
