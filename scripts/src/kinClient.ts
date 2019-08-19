@@ -18,7 +18,6 @@ export class KinClient {
 	private readonly _accountDataRetriever: AccountDataRetriever;
 	private readonly _friendbotHandler: Friendbot | undefined;
 	private readonly _blockchainInfoRetriever: BlockchainInfoRetriever;
-	private _kinAccounts: KinAccount[] | null;
 
 	constructor(private readonly _environment: Environment,  readonly keystoreProvider: KeystoreProvider, private readonly _appId?: string) {
 		this._server = new Server(_environment.url, { allowHttp: false, headers: GLOBAL_HEADERS,  retry: GLOBAL_RETRY });
@@ -26,20 +25,14 @@ export class KinClient {
 		this._accountDataRetriever = new AccountDataRetriever(this._server);
 		this._friendbotHandler = _environment.friendbotUrl ? new Friendbot(_environment.friendbotUrl, this._accountDataRetriever) : undefined;
 		this._blockchainInfoRetriever = new BlockchainInfoRetriever(this._server);
-		this._kinAccounts = null;
 	}
 
 	get kinAccounts(): Promise<KinAccount[]> {
-		if (this._kinAccounts != null) {
-			return Promise.resolve(this._kinAccounts);
-		} else {
-			return new Promise(resolve => {
-				this.keystoreProvider.accounts.then(accounts => {
-					resolve(accounts.map(account => new KinAccount(account, this.keystoreProvider,
-						this._accountDataRetriever, this._server, this._blockchainInfoRetriever, this._appId)));
-				});
-			});
-		}
+		return new Promise(async resolve => {
+			const accounts = await this.keystoreProvider.accounts;
+			resolve(accounts.map(account => new KinAccount(account, this.keystoreProvider,
+					this._accountDataRetriever, this._server, this._blockchainInfoRetriever, this._appId)));
+		});
 	}
 
 	get environment() {
