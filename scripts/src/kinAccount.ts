@@ -2,7 +2,7 @@ import { AccountData, Balance } from "./blockchain/horizonModels";
 import { Server } from "@kinecosystem/kin-sdk";
 import { AccountDataRetriever } from "./blockchain/accountDataRetriever";
 import { TxSender } from "./blockchain/txSender";
-import { Address, TransactionId } from "./types";
+import { Address, TransactionId, Channel } from "./types";
 import * as config from "./config";
 import { TransactionBuilder } from "./blockchain/transactionBuilder";
 import { IBlockchainInfoRetriever } from "./blockchain/blockchainInfoRetriever";
@@ -32,12 +32,12 @@ export class KinAccount {
 		return await this._accountDataRetriever.fetchKinBalance(this._publicAddress);
 	}
 
-	public async getData(): Promise<AccountData> {
+	async getData(): Promise<AccountData> {
 		return await this._accountDataRetriever.fetchAccountData(this._publicAddress);
 	}
 
 	public async getTransactionBuilder(param: GetTransactionParams): Promise<TransactionBuilder> {
-		return await this._txSender.getTransactionBuilder(param.fee);
+		return await this._txSender.getTransactionBuilder(param.fee, param.channel);
 	}
 
 	public async buildCreateAccount(params: CreateAccountParams): Promise<TransactionBuilder> {
@@ -79,6 +79,11 @@ export interface CreateAccountParams {
 	 * Optional text to put into transaction memo, up to 21 chars.
 	 */
 	memoText?: string;
+
+	/**
+	 * Optional channel to build the transaction with
+	 */
+	channel?: Channel;
 }
 
 export interface SendKinParams {
@@ -100,6 +105,11 @@ export interface SendKinParams {
 	 * Optional text to put into transaction memo, up to 21 chars.
 	 */
 	memoText?: string;
+
+	/**
+	 * Optional channel to build the transaction with
+	 */
+	channel?: Channel;
 }
 
 export interface GetTransactionParams {
@@ -108,4 +118,9 @@ export interface GetTransactionParams {
 	 * Fee to be deducted for the transaction.
 	 */
 	fee: number;
+
+	/**
+	 * Optional channel to build the transaction with
+	 */
+	channel?: Channel;
 }

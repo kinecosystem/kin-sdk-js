@@ -1,4 +1,5 @@
 import {Memo, Operation, xdr} from "@kinecosystem/kin-sdk";
+import {TransactionConverter} from "./transactionConverter"
 
 export type Balance = number;
 export type Address = string;
@@ -48,6 +49,15 @@ export namespace AccountData {
 }
 
 export type Transaction = PaymentTransaction | CreateAccountTransaction | RawTransaction;
+
+export namespace Transaction {
+	export function decodeTransaction(params: DecodeTransactionParams): Transaction {
+		return TransactionConverter.fromTransactionPayload(params.envelope, params.networkId) as PaymentTransaction | CreateAccountTransaction;
+	}
+	export function decodeRawTransaction(params: DecodeTransactionParams): RawTransaction {
+		return TransactionConverter.fromTransactionPayload(params.envelope, params.networkId, false) as RawTransaction;
+	}
+}
 
 export interface TransactionBase {
 	type: "PaymentTransaction" | "CreateAccountTransaction" | "RawTransaction";

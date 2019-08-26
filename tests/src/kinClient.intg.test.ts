@@ -23,8 +23,10 @@ describe("KinClient", async () => {
 		const accounts = await client.kinAccounts;
 		const transactionId = await client.friendbot({ address: accounts[2].publicAddress, amount: 10000 });
 		expect(transactionId).toBeDefined();
-		expect(await accounts[2].isAccountExisting()).toBe(true);
-		expect(await accounts[2].getBalance()).toBe(10000);
+		const accountExists = await accounts[2].isAccountExisting()
+		expect(accountExists).toBe(true);
+		const balance = await accounts[2].getBalance()
+		expect(balance).toBe(10000);
 	}, 30000);
 
 	test("Test getData", async () => {

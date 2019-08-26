@@ -1,10 +1,6 @@
 import { Environment } from "./environment";
 import { KinAccount } from "./kinAccount";
 import KeystoreProvider from "./blockchain/keystoreProvider";
-import {
-	OnPaymentListener,
-	PaymentListener
-} from "./blockchain/horizonModels";
 import { Network, Server } from "@kinecosystem/kin-sdk";
 import { AccountDataRetriever } from "./blockchain/accountDataRetriever";
 import { Friendbot } from "./friendbot";
@@ -58,47 +54,6 @@ export class KinClient {
 		}
 		return this._friendbotHandler.createOrFund(params.address, params.amount);
 	}
-}
-
-/**
- * Parameters for getting transaction history
- */
-export interface TransactionHistoryParams {
-
-	/**
-	 * Target account address for getting the history for.
-	 */
-	address: Address;
-	/**
-	 * Maximum count of transactions to retrieve.
-	 */
-	limit?: number;
-	/**
-	 * Order based on timestamp
-	 */
-	order?: "asc" | "desc";
-	/**
-	 * Optional cursor
-	 */
-	cursor?: string;
-}
-
-export interface PaymentListenerParams {
-
-	/**
-	 * Payment callback listener method, will be triggered when payment was happened.
-	 */
-	onPayment: OnPaymentListener;
-
-	/**
-	 * List of addresses to listen for payments.
-	 */
-	addresses: Address[];
-}
-
-export interface CreateKinAccountParams {
-	seed: string;
-	appId?: string;
 }
 
 export interface FriendBotParams {

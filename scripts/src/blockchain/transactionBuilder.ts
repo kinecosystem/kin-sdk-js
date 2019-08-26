@@ -7,7 +7,8 @@ import {
 	TransactionBuilder as BaseTransactionBuilder,
 	xdr
 } from "@kinecosystem/kin-sdk";
-import { MEMO_LENGTH, MEMO_LENGTH_ERROR } from "../config";
+import {Channel} from "../types";
+import {MEMO_LENGTH, MEMO_LENGTH_ERROR} from "../config";
 
 interface TransactionBuilderOptions extends BaseTransactionBuilder.TransactionBuilderOptions {
 	fee: number;
@@ -18,13 +19,15 @@ interface TransactionBuilderOptions extends BaseTransactionBuilder.TransactionBu
 export class TransactionBuilder {
 
 	private readonly _transactionBuilder: BaseTransactionBuilder;
+	private readonly _channel?: Channel;
 	private readonly _appId?: string;
 
-	constructor(sourceAccount: Account, options: TransactionBuilderOptions) {
+	constructor(sourceAccount: Account, options: TransactionBuilderOptions, channel?: Channel) {
 		this._transactionBuilder = new BaseTransactionBuilder(sourceAccount, options);
 		this._appId = options.appId;
 		this.addFee(options.fee);
 		this.addMemo(options.memo ? options.memo : Memo.text(""));
+		this._channel = channel;
 	}
 
 	public addFee(fee: number): this {
@@ -69,6 +72,10 @@ export class TransactionBuilder {
 		return this;
 	}
 
+	public get channel(): Channel | undefined {
+		return this._channel;
+	}
+
 	public build(): Transaction {
 		return this._transactionBuilder.build();
 	}
@@ -76,4 +83,5 @@ export class TransactionBuilder {
 	public toString(): string {
 		return this.build().toEnvelope().toXDR("base64").toString();
 	}
+
 }

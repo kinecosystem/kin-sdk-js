@@ -4,12 +4,29 @@ import * as crypto from "crypto";
 
 export class KeyPair {
 
+	private _keypair: Keypair;
+
+
 	public get seed(): string {
 		return this._keypair.secret();
 	}
 
 	public get publicAddress(): Address {
 		return this._keypair.publicKey();
+	}
+
+	private constructor(seed?: string, seedBuffer?: Buffer) {
+		if (seed) {
+			this._keypair = Keypair.fromSecret(seed);
+		} else if (seedBuffer) {
+			this._keypair = Keypair.fromRawEd25519Seed(seedBuffer);
+		} else {
+			this._keypair = Keypair.random();
+		}
+	}
+
+	public sign(data: Buffer) {
+		this._keypair.sign(data);
 	}
 
 	/**
@@ -43,21 +60,5 @@ export class KeyPair {
 	 */
 	public static addressFromSeed(seed: string): Address {
 		return Keypair.fromSecret(seed).publicKey();
-	}
-
-	private _keypair: Keypair;
-
-	private constructor(seed?: string, seedBuffer?: Buffer) {
-		if (seed) {
-			this._keypair = Keypair.fromSecret(seed);
-		} else if (seedBuffer) {
-			this._keypair = Keypair.fromRawEd25519Seed(seedBuffer);
-		} else {
-			this._keypair = Keypair.random();
-		}
-	}
-
-	public sign(data: Buffer) {
-		this._keypair.sign(data);
 	}
 }
