@@ -64,6 +64,17 @@ export class TxSender {
 		return builder;
 	}
 
+	public async getWhitelistableTransaction(transactionString: string): Promise<TransactionId>{
+		try {
+			const signedTransactionString = await this._keystoreProvider.sign(this._publicAddress, transactionString);
+			const signedTransaction = new Transaction(signedTransactionString);
+			return signedTransaction.toEnvelope().toXDR().toString('base64');
+		} catch (e) {
+			const error = ErrorDecoder.translate(e);
+			throw error;
+		}
+	}
+
 	public async submitTransaction(transactionString: string): Promise<TransactionId> {
 		try {
 			const signedTransactionString = await this._keystoreProvider.sign(this._publicAddress, transactionString);

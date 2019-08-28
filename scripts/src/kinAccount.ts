@@ -52,6 +52,10 @@ export class KinAccount {
 		return await this._txSender.submitTransaction(transaction);
 	}
 
+	public async getWhitelistableTransaction(transaction: string): Promise<TransactionId> {
+		return await this._txSender.getWhitelistableTransaction(transaction);
+	}
+
 	/**
 	 * Check if the account exists on kin blockchain.
 	 */
