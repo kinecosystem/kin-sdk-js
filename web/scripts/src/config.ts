@@ -1,4 +1,4 @@
-const PACKAGE_JSON = require("../package.json").version;
+const PACKAGE_JSON = require("../../package.json").version;
 
 export const ANON_APP_ID: string = "anon";
 export const ADDRESS_LENGTH: number = 56;

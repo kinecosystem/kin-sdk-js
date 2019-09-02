@@ -8,6 +8,7 @@ import { IBlockchainInfoRetriever, BlockchainInfoRetriever } from "./blockchain/
 import { Friendbot } from "./friendbot"
 import { Environment } from "./environment";
 import { KeystoreProvider } from "./blockchain/keystoreProvider";
+import { SimpleKeystoreProvider } from "./blockchain/simple-provider"
 import { KeyPair } from "./blockchain/keyPair";
 import { Keypair as BaseKeyPair , Transaction as XdrTransaction} from "@kinecosystem/kin-sdk";
 
@@ -26,6 +27,7 @@ export {
 BlockchainInfoRetriever,
 	Friendbot,
 	KeystoreProvider,
+	SimpleKeystoreProvider,
 	Environment,
 	XdrTransaction,
 	KeyPair,

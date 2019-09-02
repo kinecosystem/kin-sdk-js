@@ -1,26 +1,20 @@
-import { AccountData, Balance } from "@kinecosystem/kin-sdk-js-common";
-import { Server } from "@kinecosystem/kin-sdk-js-common";
-import { AccountDataRetriever } from "@kinecosystem/kin-sdk-js-common";
-import { TxSender } from "@kinecosystem/kin-sdk-js-common";
-import { Address, TransactionId, Channel } from "@kinecosystem/kin-sdk-js-common";
 import * as config from "./config";
-import { TransactionBuilder } from "@kinecosystem/kin-sdk-js-common";
-import { IBlockchainInfoRetriever } from "@kinecosystem/kin-sdk-js-common";
-import { KeystoreProvider } from "@kinecosystem/kin-sdk-js-common";
+import * as KinCommonSdk from "@kinecosystem/kin-sdk-js-common";
 
 export class KinAccount {
-	private readonly _txSender: TxSender;
+	private readonly _txSender: KinCommonSdk.TxSender;
 
-	constructor(private readonly _publicAddress: Address, _keystoreProvider: KeystoreProvider,
-		           private readonly _accountDataRetriever: AccountDataRetriever, server: Server, blockchainInfoRetriever: IBlockchainInfoRetriever,
+	constructor(private readonly _publicAddress: KinCommonSdk.Address, _keystoreProvider: KinCommonSdk.KeystoreProvider,
+				   private readonly _accountDataRetriever: KinCommonSdk.AccountDataRetriever, server: KinCommonSdk.Server, 
+				   private readonly blockchainInfoRetriever: KinCommonSdk.IBlockchainInfoRetriever,
 		           private readonly _appId: string = config.ANON_APP_ID) {
 		if (!config.APP_ID_REGEX.test(_appId)) {
 			throw new Error("Invalid app id: " + _appId);
 		}
-		this._txSender = new TxSender(_publicAddress, _keystoreProvider, this._appId, server, blockchainInfoRetriever);
+		this._txSender = new KinCommonSdk.TxSender(_publicAddress, _keystoreProvider, this._appId, server, blockchainInfoRetriever);
 	}
 
-	get publicAddress(): Address {
+	get publicAddress(): KinCommonSdk.Address {
 		return this._publicAddress;
 	}
 
@@ -28,27 +22,27 @@ export class KinAccount {
 		return this._appId;
 	}
 
-	public async getBalance(): Promise<Balance> {
+	public async getBalance(): Promise<KinCommonSdk.Balance> {
 		return await this._accountDataRetriever.fetchKinBalance(this._publicAddress);
 	}
 
-	async getData(): Promise<AccountData> {
+	async getData(): Promise<KinCommonSdk.AccountData> {
 		return await this._accountDataRetriever.fetchAccountData(this._publicAddress);
 	}
 
-	public async getTransactionBuilder(param: GetTransactionParams): Promise<TransactionBuilder> {
+	public async getTransactionBuilder(param: GetTransactionParams): Promise<KinCommonSdk.TransactionBuilder> {
 		return await this._txSender.getTransactionBuilder(param.fee, param.channel);
 	}
 
-	public async buildCreateAccount(params: CreateAccountParams): Promise<TransactionBuilder> {
+	public async buildCreateAccount(params: CreateAccountParams): Promise<KinCommonSdk.TransactionBuilder> {
 		return await this._txSender.buildCreateAccount(params.address, params.startingBalance, params.fee, params.memoText);
 	}
 
-	public async buildTransaction(params: SendKinParams): Promise<TransactionBuilder> {
+	public async buildTransaction(params: SendKinParams): Promise<KinCommonSdk.TransactionBuilder> {
 		return await this._txSender.buildTransaction(params.address, params.amount, params.fee, params.memoText);
 	}
 
-	public async submitTransaction(transaction: string): Promise<TransactionId> {
+	public async submitTransaction(transaction: string): Promise<KinCommonSdk.TransactionId> {
 		return await this._txSender.submitTransaction(transaction);
 	}
 
@@ -65,7 +59,7 @@ export interface CreateAccountParams {
 	/**
 	 * Target account address to create.
 	 */
-	address: Address;
+	address: KinCommonSdk.Address;
 	/**
 	 * The starting balance of the created account.
 	 */
@@ -83,7 +77,7 @@ export interface CreateAccountParams {
 	/**
 	 * Optional channel to build the transaction with
 	 */
-	channel?: Channel;
+	channel?: KinCommonSdk.Channel;
 }
 
 export interface SendKinParams {
@@ -91,7 +85,7 @@ export interface SendKinParams {
 	/**
 	 * Target account address to create.
 	 */
-	address: Address;
+	address: KinCommonSdk.Address;
 	/**
 	 * The amount in kin to send.
 	 */
@@ -109,7 +103,7 @@ export interface SendKinParams {
 	/**
 	 * Optional channel to build the transaction with
 	 */
-	channel?: Channel;
+	channel?: KinCommonSdk.Channel;
 }
 
 export interface GetTransactionParams {
@@ -122,5 +116,5 @@ export interface GetTransactionParams {
 	/**
 	 * Optional channel to build the transaction with
 	 */
-	channel?: Channel;
+	channel?: KinCommonSdk.Channel;
 }

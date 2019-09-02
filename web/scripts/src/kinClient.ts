@@ -1,26 +1,21 @@
-import { Environment } from "@kinecosystem/kin-sdk-js-common";
+import * as KinCommonSdk from "@kinecosystem/kin-sdk-js-common";
 import { KinAccount } from "./kinAccount";
-import { KeystoreProvider } from "@kinecosystem/kin-sdk-js-common";
-import { Network, Server } from "@kinecosystem/kin-sdk-js-common";
-import { AccountDataRetriever } from "@kinecosystem/kin-sdk-js-common";
-import { Friendbot } from "@kinecosystem/kin-sdk-js-common";
-import { BlockchainInfoRetriever } from "@kinecosystem/kin-sdk-js-common";
-import { Address, TransactionId } from "@kinecosystem/kin-sdk-js-common";
 import { GLOBAL_HEADERS, GLOBAL_RETRY } from "./config";
 
 export class KinClient {
 
-	private readonly _server: Server;
-	private readonly _accountDataRetriever: AccountDataRetriever;
-	private readonly _friendbotHandler: Friendbot | undefined;
-	private readonly _blockchainInfoRetriever: BlockchainInfoRetriever;
+	private readonly _server: KinCommonSdk.Server;
+	private readonly _accountDataRetriever: KinCommonSdk.AccountDataRetriever;
+	private readonly _friendbotHandler: KinCommonSdk.Friendbot | undefined;
+	private readonly _blockchainInfoRetriever: KinCommonSdk.BlockchainInfoRetriever;
 
-	constructor(private readonly _environment: Environment,  readonly keystoreProvider: KeystoreProvider, private readonly _appId?: string) {
-		this._server = new Server(_environment.url, { allowHttp: false, headers: GLOBAL_HEADERS,  retry: GLOBAL_RETRY });
-		Network.use(new Network(_environment.passphrase));
-		this._accountDataRetriever = new AccountDataRetriever(this._server);
-		this._friendbotHandler = _environment.friendbotUrl ? new Friendbot(_environment.friendbotUrl, this._accountDataRetriever) : undefined;
-		this._blockchainInfoRetriever = new BlockchainInfoRetriever(this._server);
+	constructor(private readonly _environment: KinCommonSdk.Environment, 
+		readonly keystoreProvider: KinCommonSdk.KeystoreProvider, private readonly _appId?: string) {
+		this._server = new KinCommonSdk.Server(_environment.url, { allowHttp: false, headers: GLOBAL_HEADERS,  retry: GLOBAL_RETRY });
+		KinCommonSdk.Network.use(new KinCommonSdk.Network(_environment.passphrase));
+		this._accountDataRetriever = new KinCommonSdk.AccountDataRetriever(this._server);
+		this._friendbotHandler = _environment.friendbotUrl ? new KinCommonSdk.Friendbot(_environment.friendbotUrl, this._accountDataRetriever) : undefined;
+		this._blockchainInfoRetriever = new KinCommonSdk.BlockchainInfoRetriever(this._server);
 	}
 
 	get kinAccounts(): Promise<KinAccount[]> {
@@ -48,7 +43,7 @@ export class KinClient {
 	 * If account already exists it will be funded, o.w. the account will be created with the input amount as starting
 	 * balance
 	 */
-	public async friendbot(params: FriendBotParams): Promise<TransactionId> {
+	public async friendbot(params: FriendBotParams): Promise<KinCommonSdk.TransactionId> {
 		if (!this._friendbotHandler) {
 			throw Error("Friendbot url not defined, friendbot is not available on production environment");
 		}
@@ -60,7 +55,7 @@ export interface FriendBotParams {
 	/**
 	 * A wallet address to create or fund.
 	 */
-	address: Address;
+	address: KinCommonSdk.Address;
 	/**
 	 * An account starting balance or an amount of kin to fund in case of an existing account.
 	 */

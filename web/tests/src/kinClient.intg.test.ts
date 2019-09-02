@@ -1,15 +1,16 @@
-import * as KinSdk from "../../scripts/src/index";
-import { SimpleKeystoreProvider } from "@kinecosystem/kin-sdk-js-keystore-providers";
+import * as KinCommonSdk from "@kinecosystem/kin-sdk-js-common";
+import {KinClient} from "../../scripts/src/kinClient";
+import {SimpleKeystoreProvider} from "@kinecosystem/kin-sdk-js-common"
 
-const keystoreProvider = new SimpleKeystoreProvider(KinSdk);
-let client: KinSdk.KinClient;
+const keystoreProvider = new KinCommonSdk.SimpleKeystoreProvider();
+let client: KinClient;
 
 describe("KinClient", async () => {
 	beforeAll(async () => {
 		keystoreProvider.addKeyPair();
 		keystoreProvider.addKeyPair();
 		keystoreProvider.addKeyPair();
-		client = new KinSdk.KinClient(Environment.Testnet, keystoreProvider);
+		client = new KinClient(KinCommonSdk.Environment.Testnet, keystoreProvider);
 		const accounts = await client.kinAccounts;
 		const transactionId = await client.friendbot({ address: accounts[0].publicAddress, amount: 10000 });
 		const secondtransactionId = await client.friendbot({ address: accounts[1].publicAddress, amount: 10000 });
