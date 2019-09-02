@@ -1,10 +1,8 @@
 const path = require("path");
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
   entry: {
-    "kin-sdk": __dirname + "/scripts/src/index.ts"
+    "kin-sdk-web": path.join(__dirname, "src/index.ts")
   },
   target: 'web',
   module: {
@@ -29,13 +27,5 @@ module.exports = {
     library: 'KinSdk',
     globalObject: 'typeof self !== \'undefined\' ? self : this',
     path: path.resolve(__dirname, "public")
-  },
-  plugins: [
-    // new CompressionPlugin(),
-    new HtmlWebpackPlugin({
-      template: './public/template.html',
-      filename: './index.html',
-      inject: 'head'
-    })
-  ],
+  }
 };

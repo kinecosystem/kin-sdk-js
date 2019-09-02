@@ -1,12 +1,12 @@
-import { AccountData, Balance } from "./blockchain/horizonModels";
-import { Server } from "@kinecosystem/kin-sdk";
-import { AccountDataRetriever } from "./blockchain/accountDataRetriever";
-import { TxSender } from "./blockchain/txSender";
-import { Address, TransactionId, Channel } from "./types";
+import { AccountData, Balance } from "@kinecosystem/kin-sdk-js-common";
+import { Server } from "@kinecosystem/kin-sdk-js-common";
+import { AccountDataRetriever } from "@kinecosystem/kin-sdk-js-common";
+import { TxSender } from "@kinecosystem/kin-sdk-js-common";
+import { Address, TransactionId, Channel } from "@kinecosystem/kin-sdk-js-common";
 import * as config from "./config";
-import { TransactionBuilder } from "./blockchain/transactionBuilder";
-import { IBlockchainInfoRetriever } from "./blockchain/blockchainInfoRetriever";
-import KeystoreProvider from "./blockchain/keystoreProvider";
+import { TransactionBuilder } from "@kinecosystem/kin-sdk-js-common";
+import { IBlockchainInfoRetriever } from "@kinecosystem/kin-sdk-js-common";
+import { KeystoreProvider } from "@kinecosystem/kin-sdk-js-common";
 
 export class KinAccount {
 	private readonly _txSender: TxSender;

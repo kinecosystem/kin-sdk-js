@@ -1,7 +1,5 @@
 import * as KinSdk from "../../scripts/src/index";
-import {TransactionBuilder} from "../../scripts/src/blockchain/transactionBuilder";
-import {INTEG_ENV} from "./integConfig";
-import { SimpleKeystoreProvider } from "./simple-provider";
+import { SimpleKeystoreProvider } from "@kinecosystem/kin-sdk-js-keystore-providers";
 
 const keystoreProvider = new SimpleKeystoreProvider(KinSdk);
 let client: KinSdk.KinClient;
@@ -11,7 +9,7 @@ describe("KinClient", async () => {
 		keystoreProvider.addKeyPair();
 		keystoreProvider.addKeyPair();
 		keystoreProvider.addKeyPair();
-		client = new KinSdk.KinClient(INTEG_ENV, keystoreProvider);
+		client = new KinSdk.KinClient(Environment.Testnet, keystoreProvider);
 		const accounts = await client.kinAccounts;
 		const transactionId = await client.friendbot({ address: accounts[0].publicAddress, amount: 10000 });
 		const secondtransactionId = await client.friendbot({ address: accounts[1].publicAddress, amount: 10000 });
@@ -59,9 +57,8 @@ describe("KinClient", async () => {
 	test("Test getBalance", async () => {
 		const accounts = await client.kinAccounts;
 
-		let sendBuilder: TransactionBuilder;
 		for (let i = 0; i < 2; i++) {
-			sendBuilder = await accounts[0].buildTransaction({
+			var sendBuilder = await accounts[0].buildTransaction({
 				address: accounts[3].publicAddress,
 				amount: 10,
 				fee: 100,

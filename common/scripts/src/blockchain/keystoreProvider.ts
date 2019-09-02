@@ -1,6 +1,6 @@
-import { Address } from "../types";
+import {Address} from "../types";
 
-export default interface KeystoreProvider {
+export interface KeystoreProvider {
 	accounts: Promise<Address[]>;
 	sign(accountAddress: Address, xdrTransaction: string): Promise<string>;
 }

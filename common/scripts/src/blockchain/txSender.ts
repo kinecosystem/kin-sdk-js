@@ -3,7 +3,7 @@ import { Asset, Operation, Server, Transaction, xdr, Network } from "@kinecosyst
 import { TransactionBuilder } from "./transactionBuilder";
 import { ErrorDecoder } from "../errors";
 import { IBlockchainInfoRetriever } from "./blockchainInfoRetriever";
-import KeystoreProvider from "./keystoreProvider";
+import { KeystoreProvider } from "./keystoreProvider";
 export class TxSender {
 	constructor(
 		private readonly _publicAddress: Address,

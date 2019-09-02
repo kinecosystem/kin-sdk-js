@@ -1,11 +1,11 @@
-import { Environment } from "./environment";
+import { Environment } from "@kinecosystem/kin-sdk-js-common";
 import { KinAccount } from "./kinAccount";
-import KeystoreProvider from "./blockchain/keystoreProvider";
-import { Network, Server } from "@kinecosystem/kin-sdk";
-import { AccountDataRetriever } from "./blockchain/accountDataRetriever";
-import { Friendbot } from "./friendbot";
-import { BlockchainInfoRetriever } from "./blockchain/blockchainInfoRetriever";
-import { Address, TransactionId } from "./types";
+import { KeystoreProvider } from "@kinecosystem/kin-sdk-js-common";
+import { Network, Server } from "@kinecosystem/kin-sdk-js-common";
+import { AccountDataRetriever } from "@kinecosystem/kin-sdk-js-common";
+import { Friendbot } from "@kinecosystem/kin-sdk-js-common";
+import { BlockchainInfoRetriever } from "@kinecosystem/kin-sdk-js-common";
+import { Address, TransactionId } from "@kinecosystem/kin-sdk-js-common";
 import { GLOBAL_HEADERS, GLOBAL_RETRY } from "./config";
 
 export class KinClient {
@@ -26,7 +26,7 @@ export class KinClient {
 	get kinAccounts(): Promise<KinAccount[]> {
 		return new Promise(async resolve => {
 			const accounts = await this.keystoreProvider.accounts;
-			resolve(accounts.map(account => new KinAccount(account, this.keystoreProvider,
+			resolve(accounts.map((account: KinAccount) => new KinAccount(account, this.keystoreProvider,
 					this._accountDataRetriever, this._server, this._blockchainInfoRetriever, this._appId)));
 		});
 	}

@@ -18,11 +18,11 @@ export class Environment {
 			friendbotUrl: "https://friendbot-testnet.kininfrastructure.com"
 		}
 	);
-
-	private readonly _name: string;
-	private readonly _url: string;
-	private readonly _passphrase: string;
-	private readonly _friendbotUrl?: string;
+	
+	readonly _name: string;
+	readonly _url: string;
+	readonly _passphrase: string;
+	readonly _friendbotUrl?: string;
 
 	get name(): string {
 		return this._name;
