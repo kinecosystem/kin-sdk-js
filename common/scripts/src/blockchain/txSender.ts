@@ -1,111 +1,97 @@
-import { Address, TransactionId, Channel } from "../types";
-import { Asset, Operation, Server, Transaction, xdr, Network } from "@kinecosystem/kin-sdk";
+import { PaymentTransactionParams, TransactionFactory } from "../blockchain/transactionFactory"
+import { TransactionId } from "../types";
+import { Server, Operation, Asset, xdr } from "@kinecosystem/kin-sdk";
 import { TransactionBuilder } from "./transactionBuilder";
+import { TransactionInterceptor, TransactionProcess } from "./transactionInterceptor"
 import { ErrorDecoder } from "../errors";
 import { IBlockchainInfoRetriever } from "./blockchainInfoRetriever";
 import { KeystoreProvider } from "./keystoreProvider";
+import { Address, Channel, Transaction, PaymentTransaction } from "../blockchain/horizonModels"
+import { XdrTransaction, Environment } from "..";
+
 export class TxSender {
 	constructor(
 		private readonly _publicAddress: Address,
 		private readonly _keystoreProvider: KeystoreProvider,
 		private readonly _appId: string,
 		private readonly _server: Server,
-		private readonly _blockchainInfoRetriever: IBlockchainInfoRetriever
+		private readonly _environment: Environment
 	) {
-
 		this._keystoreProvider = _keystoreProvider;
 		this._appId = _appId;
 		this._server = _server;
-		this._blockchainInfoRetriever = _blockchainInfoRetriever;
+		this._environment = _environment
 	}
 
 	get appId() {
 		return this._appId;
 	}
 
-	public async getTransactionBuilder(txFee: number, channel?: Channel): Promise<TransactionBuilder> {
-		const response = await this.loadSenderAccountData(channel);
-		return new TransactionBuilder(
-			response,
-			{ fee: txFee, appId: this.appId }, 
-			channel
-		).setTimeout(0);
-	}
-
-	public async buildCreateAccount(address: Address, startingBalance: number, fee: number, memo?: string, channel?: Channel): Promise<TransactionBuilder> {
-		const builder = await this.getTransactionBuilder(fee, channel);
-		if (memo) {
-			builder.addTextMemo(memo);
+	static TransactionProcessImpl = class implements TransactionProcess {
+		constructor(readonly _transaction: Transaction, readonly _server:Server) {
 		}
-		builder.addOperation(
-			Operation.createAccount({
-				source: this._publicAddress,
-				destination: address,
-				startingBalance: startingBalance.toString(),
-			})
-		);
-		return builder;
-	}
 
-	public async buildTransaction(address: Address, amount: number, fee: number, memo?: string, channel?: Channel): Promise<TransactionBuilder> {
-		const builder = await this.getTransactionBuilder(fee, channel);
-		if (memo) {
-			builder.addTextMemo(memo);
+		transaction(): import("./horizonModels").Transaction {
+			return this._transaction
+		}		
+		
+		async sendTransaction(transaction: import("./horizonModels").Transaction): Promise<TransactionId> {
+			const record = await this._server.submitTransaction(transaction.xdrTransaction)
+			return record.hash;
 		}
-		builder.addOperation(
-			Operation.payment({
-				source: this._publicAddress,
-				destination: address,
-				asset: Asset.native(),
-				amount: amount.toString(),
-			})
-		);
-		return builder;
+
+		async sendTransactionEnvelope(transactionEnvelope: string): Promise<TransactionId> {
+			const record = await this._server.submitTransaction(new XdrTransaction(transactionEnvelope))
+			return record.hash;
+		}
 	}
 
-	public async submitTransaction(transactionString: string): Promise<TransactionId> {
+	public async sendPaymentTransaction(transactionParams: PaymentTransactionParams, interceptor?: TransactionInterceptor): Promise<TransactionId> {
 		try {
-			const signedTransactionString = await this._keystoreProvider.sign(this._publicAddress, transactionString);
-			const signedTransaction = new Transaction(signedTransactionString);
-			const transactionResponse = await this._server.submitTransaction(signedTransaction);
-			// if (builder.channel) {
-			// 	signers.push(Keypair.fromSecret(builder.channel.keyPair.seed));
-			// }
-	// 		const transactionEnvelope = xdr.TransactionEnvelope.fromXDR(new Buffer(transaction, "base64"));
-	// 		const xdrTransaction = new Transaction(transactionEnvelope);
-	// 		const signedXdrTransaction = await this._keystoreProvider.signTransaction(
-	// 			this._publicAddress,
-	// 			xdrTransaction
-	// 		);
-	// 		const transactionResponse = await this._server.submitTransaction(
-	// 			signedXdrTransaction
-	// 		);
-	// 		return transactionResponse.hash;
-	// 	} catch (e) {
-	// 		const error = ErrorDecoder.translate(e);
-	// 		throw error;
-	// 	}
-	// }
-
-	// public async submitTransaction(transaction: Transaction): Promise<TransactionId> {
-	// 	try {
-	// 		const signedXdrTransaction = await this._keystoreProvider.signTransaction(
-	// 			this._publicAddress,
-	// 			transaction
-	// 		);
-	// 		const transactionResponse = await this._server.submitTransaction(
-	// 			signedXdrTransaction
-	// 		);
-	// 		// HERE
-			return transactionResponse.hash;
+			
+			let transactionId: TransactionId;
+			const xdrTransactionEnvelope = await this.buildTransactionEnvelope(transactionParams);
+			const signedEnvelope = await this._keystoreProvider.sign(xdrTransactionEnvelope, this._publicAddress);
+			console.log("xdrEnvelope="+signedEnvelope)
+			if (interceptor != null){
+				const paymentTransaction = TransactionFactory.fromTransactionPayload(signedEnvelope, this._environment._passphrase);
+				transactionId = await interceptor.interceptTransactionSending(new TxSender.TransactionProcessImpl(paymentTransaction, this._server));
+			}
+			else {
+				const transactionResponse = await this._server.submitTransaction(new XdrTransaction(signedEnvelope));
+				transactionId = transactionResponse.hash;
+			}
+			return transactionId;
 		} catch (e) {
 			const error = ErrorDecoder.translate(e);
 			throw error;
 		}
 	}
 
+	private async buildTransactionEnvelope(transactionParams: PaymentTransactionParams) {
+		const builder = await this.getTransactionBuilder(transactionParams.fee, transactionParams.channel);
+		if (transactionParams.memoText) {
+			builder.addTextMemo(transactionParams.memoText);
+		}
+		builder.addOperation(Operation.payment({
+			source: this._publicAddress,
+			destination: transactionParams.address,
+			asset: Asset.native(),
+			amount: transactionParams.amount.toString(),
+		}));
+		return builder.buildEnvelope();
+	}
+
+	private async getTransactionBuilder(txFee: number, txChannel?: Channel): Promise<TransactionBuilder> {
+		const response = await this.loadSenderAccountData(txChannel);
+		return new TransactionBuilder(
+			response,
+			{ fee: txFee, appId: this.appId, channel: txChannel, keyStoreProvider: this._keystoreProvider}, 
+		).setTimeout(0);
+	}
+
 	private async loadSenderAccountData(channel?: Channel) {
-		const addressToLoad = channel ? channel.keyPair.publicAddress : this._publicAddress;
+		const addressToLoad = channel ? channel.publicAddress : this._publicAddress;
 		const response: Server.AccountResponse = await this._server.loadAccount(
 			addressToLoad
 		);

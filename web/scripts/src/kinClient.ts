@@ -1,6 +1,7 @@
 import * as KinCommonSdk from "@kinecosystem/kin-sdk-js-common";
+import {Address, TransactionId, GLOBAL_RETRY } from "@kinecosystem/kin-sdk-js-common"
 import { KinAccount } from "./kinAccount";
-import { GLOBAL_HEADERS, GLOBAL_RETRY } from "./config";
+import { GLOBAL_HEADERS } from "./config";
 
 export class KinClient {
 
@@ -20,11 +21,12 @@ export class KinClient {
 
 	get kinAccounts(): Promise<KinAccount[]> {
 		return new Promise(async resolve => {
-			const accounts = await this.keystoreProvider.accounts;
-			resolve(accounts.map((account: KinAccount) => new KinAccount(account, this.keystoreProvider,
-					this._accountDataRetriever, this._server, this._blockchainInfoRetriever, this._appId)));
-		});
-	}
+			const publicAddresses = await this.keystoreProvider.accounts;
+			resolve(publicAddresses.map((address: Address) => new KinAccount(address, this.keystoreProvider,
+					this._accountDataRetriever, this._server, 
+					this._environment, this._appId)));
+			});
+		}
 
 	get environment() {
 		return this._environment;
@@ -55,7 +57,7 @@ export interface FriendBotParams {
 	/**
 	 * A wallet address to create or fund.
 	 */
-	address: KinCommonSdk.Address;
+	address: Address;
 	/**
 	 * An account starting balance or an amount of kin to fund in case of an existing account.
 	 */

@@ -1,8 +1,7 @@
-import * as KinCommonSdk from "@kinecosystem/kin-sdk-js-common";
 import {KinClient} from "../../scripts/src/kinClient";
-import {SimpleKeystoreProvider} from "@kinecosystem/kin-sdk-js-common"
+import {SimpleKeystoreProvider, PaymentTransactionParams, Environment} from "@kinecosystem/kin-sdk-js-common"
 
-const keystoreProvider = new KinCommonSdk.SimpleKeystoreProvider();
+const keystoreProvider = new SimpleKeystoreProvider();
 let client: KinClient;
 
 describe("KinClient", async () => {
@@ -10,12 +9,14 @@ describe("KinClient", async () => {
 		keystoreProvider.addKeyPair();
 		keystoreProvider.addKeyPair();
 		keystoreProvider.addKeyPair();
-		client = new KinClient(KinCommonSdk.Environment.Testnet, keystoreProvider);
+		client = new KinClient(Environment.Testnet, keystoreProvider);
 		const accounts = await client.kinAccounts;
 		const transactionId = await client.friendbot({ address: accounts[0].publicAddress, amount: 10000 });
 		const secondtransactionId = await client.friendbot({ address: accounts[1].publicAddress, amount: 10000 });
+		const thirdone = await client.friendbot({ address: accounts[3].publicAddress, amount: 10000 });
 		expect(transactionId).toBeDefined();
 		expect(secondtransactionId).toBeDefined();
+		expect(thirdone).toBeDefined();
 	}, 30000);
 
 	test("Create sender with friend bot", async () => {
@@ -38,37 +39,25 @@ describe("KinClient", async () => {
 		expect(data.signers.length).toBe(1);
 		expect(data.signers[0].publicKey).toBe(accounts[0].publicAddress);
 		expect(data.id).toBe(accounts[0].publicAddress);
-
-		const builder = await accounts[0].buildCreateAccount({
-			address: accounts[3].publicAddress,
-			fee: 100,
-			startingBalance: 1000,
-			memoText: "my first wallet"
-		});
-
-		await accounts[0].submitTransaction(builder.toString());
-		const data2 = await accounts[0].getData();
-		expect(data2.sequenceNumber).toBe(data.sequenceNumber + 1);
 	}, 30000);
 
 	test("Test getMinimumFee", async () => {
 		expect(await client.getMinimumFee()).toBe(100);
 	}, 60000);
 
-	test("Test getBalance", async () => {
+	test("Test sendPaymentTransaction without interceptor", async () => {
 		const accounts = await client.kinAccounts;
 
 		for (let i = 0; i < 2; i++) {
-			var sendBuilder = await accounts[0].buildTransaction({
-				address: accounts[3].publicAddress,
-				amount: 10,
+			var sendBuilder = await accounts[0].sendPaymentTransaction(<PaymentTransactionParams> {
 				fee: 100,
-				memoText: "sending kin: " + i
-			});
-			await accounts[0].submitTransaction(sendBuilder.toString());
+				memoText:"sending kin: "+i,
+				address:accounts[3].publicAddress,
+				amount: 10
+			})
 		}
-
 		const balance = await accounts[3].getBalance();
-		expect(balance).toBe(1020);
+		expect(balance).toBe(10020);
 	}, 60000);
+
 });

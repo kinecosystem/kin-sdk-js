@@ -1,8 +1,10 @@
-import { AccountData, Balance } from "./blockchain/horizonModels";
+import { AccountData, Balance, Channel, Address } from "./blockchain/horizonModels";
+import { TransactionParams, PaymentTransactionParams} from "./blockchain/transactionFactory"
+import { TransactionInterceptor, TransactionProcess} from "./blockchain/transactionInterceptor"
 import { Network, Server } from "@kinecosystem/kin-sdk";
 import { AccountDataRetriever } from "./blockchain/accountDataRetriever";
 import { TxSender } from "./blockchain/txSender";
-import { Address, TransactionId, Channel } from "./types";
+import { TransactionId } from "./types";
 import { TransactionBuilder } from "./blockchain/transactionBuilder";
 import { IBlockchainInfoRetriever, BlockchainInfoRetriever } from "./blockchain/blockchainInfoRetriever";
 import { Friendbot } from "./friendbot"
@@ -11,7 +13,6 @@ import { KeystoreProvider } from "./blockchain/keystoreProvider";
 import { SimpleKeystoreProvider } from "./blockchain/simple-provider"
 import { KeyPair } from "./blockchain/keyPair";
 import { Keypair as BaseKeyPair , Transaction as XdrTransaction} from "@kinecosystem/kin-sdk";
-
 export {
 	AccountData,
 	Balance,
@@ -31,5 +32,9 @@ BlockchainInfoRetriever,
 	Environment,
 	XdrTransaction,
 	KeyPair,
-	BaseKeyPair
+	BaseKeyPair,
+	TransactionParams,
+	PaymentTransactionParams,
+	TransactionInterceptor,
+	TransactionProcess
 };

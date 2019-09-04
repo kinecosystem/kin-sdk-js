@@ -3,17 +3,20 @@ import {
 	Memo,
 	MemoText,
 	MemoType,
-	Transaction,
+	Transaction as XdrTransaction,
 	TransactionBuilder as BaseTransactionBuilder,
 	xdr
 } from "@kinecosystem/kin-sdk";
-import {Channel} from "../types";
+import {Channel, Address} from "./horizonModels";
 import {MEMO_LENGTH, MEMO_LENGTH_ERROR} from "../config";
+import { TxSender, KeystoreProvider } from "..";
 
 interface TransactionBuilderOptions extends BaseTransactionBuilder.TransactionBuilderOptions {
 	fee: number;
 	appId: string;
 	memo?: Memo<MemoType.Text>;
+	channel?: Channel;
+	keyStoreProvider: KeystoreProvider
 }
 
 export class TransactionBuilder {
@@ -21,13 +24,15 @@ export class TransactionBuilder {
 	private readonly _transactionBuilder: BaseTransactionBuilder;
 	private readonly _channel?: Channel;
 	private readonly _appId?: string;
+	private readonly _keyStoreProvider?: KeystoreProvider
 
-	constructor(sourceAccount: Account, options: TransactionBuilderOptions, channel?: Channel) {
+	constructor(sourceAccount: Account, options: TransactionBuilderOptions) {
 		this._transactionBuilder = new BaseTransactionBuilder(sourceAccount, options);
 		this._appId = options.appId;
 		this.addFee(options.fee);
 		this.addMemo(options.memo ? options.memo : Memo.text(""));
-		this._channel = channel;
+		this._channel = options.channel;
+		this._keyStoreProvider = options.keyStoreProvider
 	}
 
 	public addFee(fee: number): this {
@@ -76,12 +81,11 @@ export class TransactionBuilder {
 		return this._channel;
 	}
 
-	public build(): Transaction {
+	public build(): XdrTransaction {
 		return this._transactionBuilder.build();
 	}
 
-	public toString(): string {
+	public buildEnvelope(): string {
 		return this.build().toEnvelope().toXDR("base64").toString();
 	}
-
 }

@@ -1,10 +1,15 @@
 import {Memo, Operation, xdr} from "@kinecosystem/kin-sdk";
-import {TransactionConverter} from "./transactionConverter"
+import {TransactionFactory} from "./transactionFactory"
+import { XdrTransaction } from "..";
 
 export type Balance = number;
 export type Address = string;
 export type TransactionId = string;
 export type AssetType = "native" | "credit_alphanum4" | "credit_alphanum12";
+
+export interface Channel {
+	readonly publicAddress: Address;
+}
 
 export interface AccountData {
 	readonly id: string;
@@ -52,10 +57,10 @@ export type Transaction = PaymentTransaction | CreateAccountTransaction | RawTra
 
 export namespace Transaction {
 	export function decodeTransaction(params: DecodeTransactionParams): Transaction {
-		return TransactionConverter.fromTransactionPayload(params.envelope, params.networkId) as PaymentTransaction | CreateAccountTransaction;
+		return TransactionFactory.fromTransactionPayload(params.envelope, params.networkId) as PaymentTransaction | CreateAccountTransaction;
 	}
 	export function decodeRawTransaction(params: DecodeTransactionParams): RawTransaction {
-		return TransactionConverter.fromTransactionPayload(params.envelope, params.networkId, false) as RawTransaction;
+		return TransactionFactory.fromTransactionPayload(params.envelope, params.networkId, false) as RawTransaction;
 	}
 }
 
@@ -67,6 +72,7 @@ export interface TransactionBase {
 	source: string;
 	timestamp: string | undefined;
 	signatures: xdr.DecoratedSignature[];
+	xdrTransaction: XdrTransaction
 }
 
 export interface PaymentTransaction extends TransactionBase {

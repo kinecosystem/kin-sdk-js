@@ -2,7 +2,7 @@ import {Server} from "@kinecosystem/kin-sdk";
 import {Address} from "../types";
 import {OnPaymentListener, PaymentListener, PaymentTransaction} from "./horizonModels";
 import {Utils} from "../utils";
-import {TransactionConverter} from "./transactionConverter"
+import {TransactionFactory} from "./transactionFactory"
 
 export class BlockchainListener {
 
@@ -29,7 +29,7 @@ class MultiAccountsListener implements PaymentListener {
 		}
 		this._stream = server.transactions().cursor('now').stream({
 			onmessage: (txRecord: Server.TransactionRecord) => {
-				let payment = TransactionConverter.fromStellarTransaction(txRecord) as PaymentTransaction;
+				let payment = TransactionFactory.fromStellarTransaction(txRecord) as PaymentTransaction;
 				if (payment.amount && payment.destination &&
 					(this._addresses.has(payment.source) || this._addresses.has(payment.destination))) {
 					_onPayment(payment);
