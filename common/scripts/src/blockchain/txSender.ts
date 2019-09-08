@@ -1,10 +1,9 @@
 import { PaymentTransactionParams, TransactionFactory } from "../blockchain/transactionFactory"
 import { TransactionId } from "../types";
-import { Server, Operation, Asset, xdr } from "@kinecosystem/kin-sdk";
+import { Server, Operation, Asset} from "@kinecosystem/kin-sdk";
 import { TransactionBuilder } from "./transactionBuilder";
 import { TransactionInterceptor, TransactionProcess } from "./transactionInterceptor"
 import { ErrorDecoder } from "../errors";
-import { IBlockchainInfoRetriever } from "./blockchainInfoRetriever";
 import { KeystoreProvider } from "./keystoreProvider";
 import { Address, Channel, Transaction, PaymentTransaction } from "../blockchain/horizonModels"
 import { XdrTransaction, Environment } from "..";
@@ -31,12 +30,12 @@ export class TxSender {
 		constructor(readonly _transaction: Transaction, readonly _server:Server) {
 		}
 
-		transaction(): import("./horizonModels").Transaction {
+		transaction(): Transaction {
 			return this._transaction
 		}		
 		
-		async sendTransaction(transaction: import("./horizonModels").Transaction): Promise<TransactionId> {
-			const record = await this._server.submitTransaction(transaction.xdrTransaction)
+		async sendTransaction(transaction: Transaction): Promise<TransactionId> {
+			const record = await this._server.submitTransaction(new XdrTransaction(transaction.envelope))
 			return record.hash;
 		}
 
@@ -46,14 +45,19 @@ export class TxSender {
 		}
 	}
 
+	// TODO -> make generic sendTransaction 
 	public async sendPaymentTransaction(transactionParams: PaymentTransactionParams, interceptor?: TransactionInterceptor): Promise<TransactionId> {
 		try {
 			
 			let transactionId: TransactionId;
 			const xdrTransactionEnvelope = await this.buildTransactionEnvelope(transactionParams);
-			const signedEnvelope = await this._keystoreProvider.sign(xdrTransactionEnvelope, this._publicAddress);
-			console.log("xdrEnvelope="+signedEnvelope)
-			if (interceptor != null){
+			let signers:string[] = []
+			signers.push(this._publicAddress)
+			if (transactionParams.channel){
+				signers.push(transactionParams.channel.publicAddress)
+			}
+			const signedEnvelope = await this._keystoreProvider.sign(xdrTransactionEnvelope, ...signers);
+			if (interceptor){
 				const paymentTransaction = TransactionFactory.fromTransactionPayload(signedEnvelope, this._environment._passphrase);
 				transactionId = await interceptor.interceptTransactionSending(new TxSender.TransactionProcessImpl(paymentTransaction, this._server));
 			}
@@ -63,6 +67,8 @@ export class TxSender {
 			}
 			return transactionId;
 		} catch (e) {
+
+			// TODO what if we have error coming from interceptor 
 			const error = ErrorDecoder.translate(e);
 			throw error;
 		}
@@ -79,7 +85,7 @@ export class TxSender {
 			asset: Asset.native(),
 			amount: transactionParams.amount.toString(),
 		}));
-		return builder.buildEnvelope();
+		return builder.build().toEnvelope().toXDR("base64").toString();
 	}
 
 	private async getTransactionBuilder(txFee: number, txChannel?: Channel): Promise<TransactionBuilder> {

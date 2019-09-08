@@ -72,7 +72,7 @@ export interface TransactionBase {
 	source: string;
 	timestamp: string | undefined;
 	signatures: xdr.DecoratedSignature[];
-	xdrTransaction: XdrTransaction
+	envelope: string
 }
 
 export interface PaymentTransaction extends TransactionBase {

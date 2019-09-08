@@ -4,3 +4,5 @@ export interface WhitelistPayload {
 	envelope: string;
 	networkId: string;
 }
+
+// TODO remove this file .... 

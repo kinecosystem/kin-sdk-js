@@ -10,6 +10,8 @@ import {
 } from "./horizonModels";
 import {NetworkMismatchedError} from "../errors"
 
+// TODO add here the definition of Transaction/PaymentTransaction etc... 
+
 export interface TransactionParams {
 	/**
 	 * Fee to be deducted for the transaction.
@@ -48,9 +50,6 @@ export interface CreateAccountParams extends TransactionParams {
 }
 
 export class TransactionFactory { 
-    // public static createPaymentTransaction(): PaymentTransaction {
-
-    // }
 
     public static fromStellarTransaction(transactionRecord: Server.TransactionRecord, simplified?: boolean): Transaction {
         const xdrTransaction = new XdrTransaction(transactionRecord.envelope_xdr);
@@ -62,7 +61,7 @@ export class TransactionFactory {
             signatures: xdrTransaction.signatures,
             source: transactionRecord.source_account,
             timestamp: transactionRecord.created_at,
-            xdrTransaction: xdrTransaction,
+            envelope: transactionRecord.envelope_xdr,
             type: "RawTransaction"
         };
 
@@ -107,7 +106,7 @@ export class TransactionFactory {
             signatures: xdrTransaction.signatures,
             source: xdrTransaction.source,
             timestamp: undefined,
-            xdrTransaction: xdrTransaction,
+            envelope: envelope,
             type: "RawTransaction"
         };
 

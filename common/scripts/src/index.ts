@@ -1,4 +1,4 @@
-import { AccountData, Balance, Channel, Address } from "./blockchain/horizonModels";
+import { AccountData, Balance, Channel, Address, Transaction, PaymentTransaction, CreateAccountTransaction, RawTransaction } from "./blockchain/horizonModels";
 import { TransactionParams, PaymentTransactionParams} from "./blockchain/transactionFactory"
 import { TransactionInterceptor, TransactionProcess} from "./blockchain/transactionInterceptor"
 import { Network, Server } from "@kinecosystem/kin-sdk";
@@ -36,5 +36,9 @@ BlockchainInfoRetriever,
 	TransactionParams,
 	PaymentTransactionParams,
 	TransactionInterceptor,
-	TransactionProcess
+	TransactionProcess,
+	Transaction, 
+	PaymentTransaction, 
+	CreateAccountTransaction, 
+	RawTransaction
 };

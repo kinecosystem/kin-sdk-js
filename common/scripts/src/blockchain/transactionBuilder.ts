@@ -84,8 +84,4 @@ export class TransactionBuilder {
 	public build(): XdrTransaction {
 		return this._transactionBuilder.build();
 	}
-
-	public buildEnvelope(): string {
-		return this.build().toEnvelope().toXDR("base64").toString();
-	}
 }
