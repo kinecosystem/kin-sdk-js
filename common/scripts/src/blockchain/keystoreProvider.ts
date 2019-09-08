@@ -1,6 +1,6 @@
-import {Address} from "../types";
+import {Address} from "./horizonModels";
 
 export interface KeystoreProvider {
-	accounts: Promise<Address[]>;
-	sign(transactionEnvelope: string, ...accountAddresses: Address[]): Promise<string>;
+	publicAddresses: Promise<Address[]>;
+	sign(transactionEnvelope: string, ...publicAddresses: Address[]): Promise<string>;
 }

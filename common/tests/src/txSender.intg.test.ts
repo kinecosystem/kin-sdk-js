@@ -4,8 +4,7 @@ import {SimpleKeystoreProvider, PaymentTransactionParams, Environment, Network,
 import {GLOBAL_HEADERS, GLOBAL_RETRY} from "../../scripts/src/config"
 import { Account, Server } from "@kinecosystem/kin-sdk";
 
-const keystoreProvider = new SimpleKeystoreProvider();
-keystoreProvider.addKeyPair();
+const keystoreProvider = new SimpleKeystoreProvider(2);
 let txSender: TxSender;
 let publicAddresses: Address []
 let accountDataRetriever: AccountDataRetriever
@@ -15,14 +14,14 @@ let receiverAddress: Address
 
 describe("Create TxSender ", async () => {
 	beforeAll(async () => {
-		publicAddresses = await keystoreProvider.accounts
+		Network.useTestNetwork()
+		publicAddresses = await keystoreProvider.publicAddresses
 		expect(publicAddresses.length).toBe(2)
 		for (let address of publicAddresses){
 			expect(address.length).toBeGreaterThan(0)
 		}
 		senderAddress = publicAddresses[0]
 		receiverAddress = publicAddresses[1]
-		Network.useTestNetwork()
 		let server = new Server(Environment.Testnet.url, 
 			{ allowHttp: false, headers: GLOBAL_HEADERS,  retry: GLOBAL_RETRY });
 		txSender = new TxSender(senderAddress, keystoreProvider, "test", server , Environment.Testnet);
@@ -41,8 +40,7 @@ describe("Create TxSender ", async () => {
 	}, 30000);
 
 	test("Test sendPaymentTransaction without interceptor", async () => {
-
-		await txSender.sendPaymentTransaction(<PaymentTransactionParams> {
+		await txSender.sendTransaction(<PaymentTransactionParams> {
 				fee: 100,
 				memoText:"sending kin",
 				address:receiverAddress,
@@ -66,7 +64,7 @@ describe("Create TxSender ", async () => {
 				return promise
 			}
 		}
-		await txSender.sendPaymentTransaction(<PaymentTransactionParams> {
+		await txSender.sendTransaction(<PaymentTransactionParams> {
 			fee: 100,
 			memoText:"sending kin",
 			address:receiverAddress,
@@ -90,7 +88,7 @@ describe("Create TxSender ", async () => {
 				return promise
 			}
 		}
-		await txSender.sendPaymentTransaction(<PaymentTransactionParams> {
+		await txSender.sendTransaction(<PaymentTransactionParams> {
 			fee: 100,
 			memoText:"sending kin",
 			address:receiverAddress,

@@ -1,44 +1,44 @@
 import {KinClient} from "../../scripts/src/kinClient";
-import {SimpleKeystoreProvider, PaymentTransactionParams, Environment} from "@kinecosystem/kin-sdk-js-common"
+import {KinAccount} from "../../scripts/src/kinAccount"
+import {SimpleKeystoreProvider, PaymentTransactionParams, Environment, 
+	TransactionInterceptor, TransactionProcess, XdrTransaction, TransactionId, Transaction} from "@kinecosystem/kin-sdk-js-common"
+import { Account } from "@kinecosystem/kin-sdk";
 
-const keystoreProvider = new SimpleKeystoreProvider();
+const keystoreProvider = new SimpleKeystoreProvider(4);
 let client: KinClient;
+let accounts: KinAccount[];
 
-describe("KinClient", async () => {
+describe("KinClient get KinAccounts ", async () => {
 	beforeAll(async () => {
-		keystoreProvider.addKeyPair();
-		keystoreProvider.addKeyPair();
-		keystoreProvider.addKeyPair();
 		client = new KinClient(Environment.Testnet, keystoreProvider);
-		const accounts = await client.kinAccounts;
-		const transactionId = await client.friendbot({ address: accounts[0].publicAddress, amount: 10000 });
-		const secondtransactionId = await client.friendbot({ address: accounts[1].publicAddress, amount: 10000 });
-		const thirdone = await client.friendbot({ address: accounts[3].publicAddress, amount: 10000 });
-		expect(transactionId).toBeDefined();
-		expect(secondtransactionId).toBeDefined();
-		expect(thirdone).toBeDefined();
+		accounts = await client.getkinAccounts();
+		expect(accounts.length).toBe(4)
+		for (let account of accounts){
+			expect(account.publicAddress).toBeDefined
+			expect(await account.isAccountExisting()).toBe(false)
+		}
 	}, 30000);
-
-	test("Create sender with friend bot", async () => {
-		const accounts = await client.kinAccounts;
-		const transactionId = await client.friendbot({ address: accounts[2].publicAddress, amount: 10000 });
-		expect(transactionId).toBeDefined();
-		const accountExists = await accounts[2].isAccountExisting()
-		expect(accountExists).toBe(true);
-		const balance = await accounts[2].getBalance()
-		expect(balance).toBe(10000);
+	test("Create accounts with friend bot and check balance", async() => {
+		for (let account of accounts){
+			let txId = await client.friendbot({ address: account.publicAddress, amount: 10000 });
+			expect(txId).toBeDefined()
+			expect(await account.isAccountExisting()).toBe(true)
+			let balance = await account.getBalance()
+			expect(balance).toBe(10000)
+		}
 	}, 30000);
 
 	test("Test getData", async () => {
-		const accounts = await client.kinAccounts;
-		expect(await accounts[0].isAccountExisting()).toBe(true);
-		const data = await accounts[0].getData();
-		expect(data.balances[0].balance).toBe(10000);
-		expect(data.balances.length).toBe(1);
-		expect(data.balances[0].assetType).toBe("native");
-		expect(data.signers.length).toBe(1);
-		expect(data.signers[0].publicKey).toBe(accounts[0].publicAddress);
-		expect(data.id).toBe(accounts[0].publicAddress);
+		for (let account of accounts){
+			expect(await account.isAccountExisting()).toBe(true);
+			const data = await account.getData();
+			expect(data.balances[0].balance).toBe(10000);
+			expect(data.balances.length).toBe(1);
+			expect(data.balances[0].assetType).toBe("native");
+			expect(data.signers.length).toBe(1);
+			expect(data.signers[0].publicKey).toBe(account.publicAddress);
+			expect(data.id).toBe(account.publicAddress);
+		}
 	}, 30000);
 
 	test("Test getMinimumFee", async () => {
@@ -46,18 +46,76 @@ describe("KinClient", async () => {
 	}, 60000);
 
 	test("Test sendPaymentTransaction without interceptor", async () => {
-		const accounts = await client.kinAccounts;
-
-		for (let i = 0; i < 2; i++) {
-			var sendBuilder = await accounts[0].sendPaymentTransaction(<PaymentTransactionParams> {
+		for (let i = 0; i <= 2; i++) {
+			var sendBuilder = await accounts[i].sendPaymentTransaction(<PaymentTransactionParams> {
 				fee: 100,
 				memoText:"sending kin: "+i,
 				address:accounts[3].publicAddress,
 				amount: 10
 			})
+			const payerBalance = await accounts[i].getBalance()
+			expect(payerBalance).toBe(9989.999)
 		}
 		const balance = await accounts[3].getBalance();
-		expect(balance).toBe(10020);
+		expect(balance).toBe(10030);
+	}, 60000);
+
+
+	test("Test sendPaymentTransaction with interceptor, send envelope", async () => {
+		const accounts = await client.getkinAccounts();
+
+		let TransactionInterceptorImpl = class implements TransactionInterceptor {
+			constructor() {
+			}
+			interceptTransactionSending(process: TransactionProcess): Promise<TransactionId> {
+				let promise: Promise<TransactionId> = new Promise(async resolve => {
+					resolve(await process.sendTransactionEnvelope(process.transaction().envelope))
+				})
+				return promise
+			}
+		}
+		
+		for (let i = 0; i <= 2; i++) {
+			var sendBuilder = await accounts[i].sendPaymentTransaction(<PaymentTransactionParams> {
+				fee: 100,
+				memoText:"sending kin: "+i,
+				address:accounts[3].publicAddress,
+				amount: 10
+			})
+			const payerBalance = await accounts[i].getBalance()
+			expect(payerBalance).toBe(9979.998)
+		}
+		const balance = await accounts[3].getBalance();
+		expect(balance).toBe(10060);
+	}, 60000);
+
+
+	test("Test sendPaymentTransaction with interceptor, send transaction", async () => {
+		const accounts = await client.getkinAccounts();
+
+		let TransactionInterceptorImpl = class implements TransactionInterceptor {
+			constructor() {
+			}
+			interceptTransactionSending(process: TransactionProcess): Promise<TransactionId> {
+				let promise: Promise<TransactionId> = new Promise(async resolve => {
+					resolve(await process.sendTransaction(process.transaction()))
+				})
+				return promise
+			}
+		}
+		
+		for (let i = 0; i <= 2; i++) {
+			var sendBuilder = await accounts[i].sendPaymentTransaction(<PaymentTransactionParams> {
+				fee: 100,
+				memoText:"sending kin: "+i,
+				address:accounts[3].publicAddress,
+				amount: 10
+			})
+			const payerBalance = await accounts[i].getBalance()
+			expect(payerBalance).toBe(9969.997)
+		}
+		const balance = await accounts[3].getBalance();
+		expect(balance).toBe(10090);
 	}, 60000);
 
 });

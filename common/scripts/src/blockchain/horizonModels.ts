@@ -1,6 +1,5 @@
 import {Memo, Operation, xdr} from "@kinecosystem/kin-sdk";
 import {TransactionFactory} from "./transactionFactory"
-import { XdrTransaction } from "..";
 
 export type Balance = number;
 export type Address = string;

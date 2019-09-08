@@ -10,8 +10,6 @@ import {
 } from "./horizonModels";
 import {NetworkMismatchedError} from "../errors"
 
-// TODO add here the definition of Transaction/PaymentTransaction etc... 
-
 export interface TransactionParams {
 	/**
 	 * Fee to be deducted for the transaction.

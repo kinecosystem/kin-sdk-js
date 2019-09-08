@@ -25,7 +25,7 @@ export class KinAccount {
 		return this._appId;
 	}
 
-	public async getBalance(): Promise<Balance> {
+	async getBalance(): Promise<Balance> {
 		return await this._accountDataRetriever.fetchKinBalance(this._publicAddress);
 	}
 

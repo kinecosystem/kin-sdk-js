@@ -2,7 +2,7 @@ import {IAccountDataRetriever} from "./blockchain/accountDataRetriever";
 import axios, {AxiosResponse} from "axios";
 import {FriendbotError, NetworkError} from "./errors";
 import {Utils} from "./utils";
-import {Address, TransactionId} from "./types";
+import {Address, TransactionId} from "./blockchain/horizonModels";
 
 export class Friendbot {
 

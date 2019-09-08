@@ -1,35 +1,32 @@
-// TODO rename file 
-import {KeystoreProvider} from "./keystoreProvider"
-import {KeyPair} from "./keyPair"
+import { KeystoreProvider } from "./keystoreProvider"
+import { KeyPair } from "./keyPair"
 import { Keypair as BaseKeyPair , Transaction as XdrTransaction } from "@kinecosystem/kin-sdk";
 
 export class SimpleKeystoreProvider implements KeystoreProvider {
     private _keypairs: KeyPair[];
 
-    constructor(_seed?: string) {
+    constructor(size?: number, seed?: string) {
         this._keypairs = [];
-        this._keypairs[0] = _seed !== undefined ? KeyPair.fromSeed(_seed) : KeyPair.generate();
+        this._keypairs[0] = seed? KeyPair.fromSeed(seed) : KeyPair.generate();   
+        for (let i=1; i<(size?size:0); i++)
+            this._keypairs[i] = KeyPair.generate();
     }
 
-    public addKeyPair() {
-        this._keypairs[this._keypairs.length] = KeyPair.generate();
-    }
-
-    get accounts() {
+    get publicAddresses() {
         return Promise.resolve(this._keypairs.map(keypair => keypair.publicAddress));
     }
 
-    public sign(transactionEnvelope: string, ...accountAddresses: string[]) {
-        if (accountAddresses != null && accountAddresses.length>0) {
+    public sign(transactionEnvelope: string, ...publicAddresses: string[]) {
+        if (publicAddresses) {
             const tx = new XdrTransaction(transactionEnvelope);
             const signers: BaseKeyPair[] = [];
-            accountAddresses.forEach((address, index) => {
+            publicAddresses.forEach((address, index) => {
                 var keypair:KeyPair|null = this.getKeyPairFor(address)
-                if (keypair != null){
+                if (keypair){
                     signers.push(BaseKeyPair.fromSecret(keypair.seed));
                 }
             })
-            if (signers.length!=0) {
+            if (signers.length>0) {
                 tx.sign(...signers);
                 return Promise.resolve(
                     tx
@@ -39,10 +36,10 @@ export class SimpleKeystoreProvider implements KeystoreProvider {
                 );
             }
             else {
-                return Promise.reject("keypair null");
+                return Promise.reject("Unable to find any private keys for the list of public addresses provided");
             }
         } else {
-            return Promise.reject("keypair null");
+            return Promise.reject("No public addresses provided");
         }
     }
 

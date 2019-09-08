@@ -1,6 +1,5 @@
 import {Server} from "@kinecosystem/kin-sdk";
-import {Address} from "../types";
-import {OnPaymentListener, PaymentListener, PaymentTransaction} from "./horizonModels";
+import {OnPaymentListener, PaymentListener, PaymentTransaction, Address} from "./horizonModels";
 import {Utils} from "../utils";
 import {TransactionFactory} from "./transactionFactory"
 

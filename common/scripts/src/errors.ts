@@ -53,6 +53,15 @@ export interface KinSdkError extends Error {
 	readonly type: ErrorType;
 }
 
+export class InterceptionError extends Error {
+	constructor(private readonly interceptionError: Error){
+		super()
+	}
+	public get error(): Error {
+		return this.interceptionError;
+	}
+}
+
 export class HorizonError extends Error implements KinSdkError {
 
 	public get resultTransactionCode(): string | undefined {

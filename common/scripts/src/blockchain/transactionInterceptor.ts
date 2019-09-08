@@ -1,5 +1,5 @@
-import {TransactionId} from "../types";
-import {Transaction} from "./horizonModels"
+
+import {Transaction, TransactionId} from "./horizonModels"
 
 export interface TransactionProcess {
     transaction(): Transaction;

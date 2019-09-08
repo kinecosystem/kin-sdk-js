@@ -1,7 +1,7 @@
 import {StrKey} from "@kinecosystem/kin-sdk";
 import {InvalidAddressError} from "./errors";
 import {ADDRESS_LENGTH} from "./config";
-import {Address} from "./types";
+import {Address} from "./blockchain/horizonModels";
 
 export namespace Utils {
 

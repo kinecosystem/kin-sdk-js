@@ -1,12 +1,11 @@
 import { PaymentTransactionParams, TransactionFactory } from "../blockchain/transactionFactory"
-import { TransactionId } from "../types";
 import { Server, Operation, Asset} from "@kinecosystem/kin-sdk";
 import { TransactionBuilder } from "./transactionBuilder";
 import { TransactionInterceptor, TransactionProcess } from "./transactionInterceptor"
-import { ErrorDecoder } from "../errors";
+import { ErrorDecoder, InterceptionError } from "../errors";
 import { KeystoreProvider } from "./keystoreProvider";
-import { Address, Channel, Transaction, PaymentTransaction } from "../blockchain/horizonModels"
-import { XdrTransaction, Environment } from "..";
+import { Address, Channel, Transaction, TransactionId } from "../blockchain/horizonModels"
+import { XdrTransaction, Environment, TransactionParams } from "..";
 
 export class TxSender {
 	constructor(
@@ -45,21 +44,36 @@ export class TxSender {
 		}
 	}
 
-	// TODO -> make generic sendTransaction 
-	public async sendPaymentTransaction(transactionParams: PaymentTransactionParams, interceptor?: TransactionInterceptor): Promise<TransactionId> {
+	public async sendTransaction(transactionParams: TransactionParams, interceptor?: TransactionInterceptor): Promise<TransactionId>{
+		let xdrTransactionEnvelope: string = ""
+		if ( (transactionParams as PaymentTransactionParams).address ){
+			xdrTransactionEnvelope = await this.buildPaymentTransactionEnvelope(transactionParams as PaymentTransactionParams);			
+		}
+		const signedEnvelope = await this.addSignatures(transactionParams, xdrTransactionEnvelope);
+		return this.sendTransactionInternal(signedEnvelope, interceptor);
+	}
+
+	private async addSignatures(transactionParams: TransactionParams, xdrTransactionEnvelope: string): Promise<string> {
+		let signers: string[] = [];
+		signers.push(this._publicAddress);
+		if (transactionParams.channel) {
+			signers.push(transactionParams.channel.publicAddress);
+		}
+		const signedEnvelope = await this._keystoreProvider.sign(xdrTransactionEnvelope, ...signers);
+		return signedEnvelope;
+	}
+
+	private async sendTransactionInternal(signedEnvelope: string, interceptor: TransactionInterceptor|undefined): Promise<TransactionId> {
 		try {
-			
 			let transactionId: TransactionId;
-			const xdrTransactionEnvelope = await this.buildTransactionEnvelope(transactionParams);
-			let signers:string[] = []
-			signers.push(this._publicAddress)
-			if (transactionParams.channel){
-				signers.push(transactionParams.channel.publicAddress)
-			}
-			const signedEnvelope = await this._keystoreProvider.sign(xdrTransactionEnvelope, ...signers);
 			if (interceptor){
 				const paymentTransaction = TransactionFactory.fromTransactionPayload(signedEnvelope, this._environment._passphrase);
-				transactionId = await interceptor.interceptTransactionSending(new TxSender.TransactionProcessImpl(paymentTransaction, this._server));
+				try {
+					transactionId = await interceptor.interceptTransactionSending(new TxSender.TransactionProcessImpl(paymentTransaction, this._server));
+				}
+				catch (e) {
+					throw new InterceptionError(e);
+				}
 			}
 			else {
 				const transactionResponse = await this._server.submitTransaction(new XdrTransaction(signedEnvelope));
@@ -67,14 +81,12 @@ export class TxSender {
 			}
 			return transactionId;
 		} catch (e) {
-
-			// TODO what if we have error coming from interceptor 
 			const error = ErrorDecoder.translate(e);
 			throw error;
 		}
 	}
 
-	private async buildTransactionEnvelope(transactionParams: PaymentTransactionParams) {
+	private async buildPaymentTransactionEnvelope(transactionParams: PaymentTransactionParams) {
 		const builder = await this.getTransactionBuilder(transactionParams.fee, transactionParams.channel);
 		if (transactionParams.memoText) {
 			builder.addTextMemo(transactionParams.memoText);
