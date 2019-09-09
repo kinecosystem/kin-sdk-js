@@ -13,7 +13,7 @@ import { TxSender, KeystoreProvider } from "..";
 
 interface TransactionBuilderOptions extends BaseTransactionBuilder.TransactionBuilderOptions {
 	fee: number;
-	appId: string;
+	appId?: string;
 	memo?: Memo<MemoType.Text>;
 	channel?: Channel;
 	keyStoreProvider: KeystoreProvider

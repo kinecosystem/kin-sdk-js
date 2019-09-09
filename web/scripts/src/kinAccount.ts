@@ -1,4 +1,3 @@
-import * as config from "./config";
 import * as KinCommonSdk from "@kinecosystem/kin-sdk-js-common";
 import {Address, Balance, AccountData, PaymentTransactionParams, TransactionInterceptor } from "@kinecosystem/kin-sdk-js-common";
 
@@ -10,18 +9,15 @@ export class KinAccount {
 				private readonly _accountDataRetriever: KinCommonSdk.AccountDataRetriever, 
 				server: KinCommonSdk.Server, 
 				environment: KinCommonSdk.Environment,
-		        private readonly _appId: string = config.ANON_APP_ID) {
-		if (!config.APP_ID_REGEX.test(_appId)) {
-			throw new Error("Invalid app id: " + _appId);
-		}
-		this._txSender = new KinCommonSdk.TxSender(_publicAddress, keyStoreProvider, _appId, server, environment);
+		        private readonly _appId?: string) {
+		this._txSender = new KinCommonSdk.TxSender(_publicAddress, keyStoreProvider, server, environment, _appId);
 	}
 
 	get publicAddress(): Address {
 		return this._publicAddress;
 	}
 
-	get appId(): string {
+	get appId(): string | undefined {
 		return this._appId;
 	}
 
@@ -35,7 +31,7 @@ export class KinAccount {
 
 	public async sendPaymentTransaction(transactionParams: PaymentTransactionParams, 
 		interceptor?: TransactionInterceptor): Promise<KinCommonSdk.TransactionId> {
-		return await this._txSender.sendPaymentTransaction(transactionParams, interceptor);
+		return await this._txSender.sendTransaction(transactionParams, interceptor);
 	}
 
 	/**

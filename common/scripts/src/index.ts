@@ -12,6 +12,7 @@ import { KeystoreProvider } from "./blockchain/keystoreProvider";
 import { SimpleKeystoreProvider } from "./blockchain/simpleKeystoreProvider"
 import { KeyPair } from "./blockchain/keyPair";
 import { Keypair as BaseKeyPair , Transaction as XdrTransaction} from "@kinecosystem/kin-sdk";
+import * as Config from "./config" 
 export {
 	AccountData,
 	Balance,
@@ -39,5 +40,6 @@ BlockchainInfoRetriever,
 	Transaction, 
 	PaymentTransaction, 
 	CreateAccountTransaction, 
-	RawTransaction
+	RawTransaction,
+	Config
 };

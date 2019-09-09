@@ -11,5 +11,3 @@ export {
 	PaymentTransactionParams,
 	TransactionInterceptor
 };
-
-// TODO can we add the interface of the SDK classes here ?

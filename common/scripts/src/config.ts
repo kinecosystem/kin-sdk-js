@@ -5,3 +5,5 @@ export const MEMO_LENGTH: number = 21;
 export const GLOBAL_HEADERS = new Map<string, string>()
 	.set("kin-sdk-js-version", PACKAGE_JSON);
 export const GLOBAL_RETRY =  { retries: 4 };
+export const ANON_APP_ID: string = "anon";
+export const APP_ID_REGEX: RegExp = new RegExp("^[a-zA-Z0-9]{3,4}$");

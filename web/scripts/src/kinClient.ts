@@ -1,6 +1,6 @@
 import * as KinCommonSdk from "@kinecosystem/kin-sdk-js-common";
 import { KinAccount } from "./kinAccount";
-import { GLOBAL_HEADERS, GLOBAL_RETRY } from "./config";
+import { GLOBAL_HEADERS } from "./config";
 
 export class KinClient {
 
@@ -9,11 +9,14 @@ export class KinClient {
 	private readonly _friendbotHandler: KinCommonSdk.Friendbot | undefined;
 	private readonly _blockchainInfoRetriever: KinCommonSdk.BlockchainInfoRetriever;
 
-	// TODO check the appId here
 	constructor(private readonly _environment: KinCommonSdk.Environment, 
 		readonly keystoreProvider: KinCommonSdk.KeystoreProvider, private readonly _appId?: string) {
-
-		this._server = new KinCommonSdk.Server(_environment.url, { allowHttp: false, headers: GLOBAL_HEADERS,  retry: GLOBAL_RETRY });
+		if (_appId) {
+			if (!KinCommonSdk.Config.APP_ID_REGEX.test(_appId)) {
+				throw new Error("Invalid app id: " + _appId);
+			}
+		}
+		this._server = new KinCommonSdk.Server(_environment.url, { allowHttp: false, headers: GLOBAL_HEADERS,  retry: KinCommonSdk.Config.GLOBAL_RETRY });
 		KinCommonSdk.Network.use(new KinCommonSdk.Network(_environment.passphrase));
 		this._accountDataRetriever = new KinCommonSdk.AccountDataRetriever(this._server);
 		this._friendbotHandler = _environment.friendbotUrl ? new KinCommonSdk.Friendbot(_environment.friendbotUrl, this._accountDataRetriever) : undefined;

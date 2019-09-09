@@ -24,7 +24,7 @@ describe("Create TxSender ", async () => {
 		receiverAddress = publicAddresses[1]
 		let server = new Server(Environment.Testnet.url, 
 			{ allowHttp: false, headers: GLOBAL_HEADERS,  retry: GLOBAL_RETRY });
-		txSender = new TxSender(senderAddress, keystoreProvider, "test", server , Environment.Testnet);
+		txSender = new TxSender(senderAddress, keystoreProvider, server , Environment.Testnet, "test");
 
 		accountDataRetriever = new AccountDataRetriever(server);
 		let friendbotUrl = Environment.Testnet.friendbotUrl ?  Environment.Testnet.friendbotUrl : "https://friendbot-testnet.kininfrastructure.com";

@@ -11,9 +11,9 @@ export class TxSender {
 	constructor(
 		private readonly _publicAddress: Address,
 		private readonly _keystoreProvider: KeystoreProvider,
-		private readonly _appId: string,
 		private readonly _server: Server,
-		private readonly _environment: Environment
+		private readonly _environment: Environment,
+		private readonly _appId?: string
 	) {
 		this._keystoreProvider = _keystoreProvider;
 		this._appId = _appId;
