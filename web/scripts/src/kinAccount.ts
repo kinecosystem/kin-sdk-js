@@ -1,5 +1,5 @@
 import * as KinCommonSdk from "@kinecosystem/kin-sdk-js-common";
-import {Address, Balance, AccountData, PaymentTransactionParams, TransactionInterceptor } from "@kinecosystem/kin-sdk-js-common";
+import {Address, Balance, AccountData, PaymentTransactionParams, TransactionInterceptor, PaymentTransaction } from "@kinecosystem/kin-sdk-js-common";
 
 export class KinAccount {
 	private readonly _txSender: KinCommonSdk.TxSender;
@@ -29,7 +29,7 @@ export class KinAccount {
 		return await this._accountDataRetriever.fetchAccountData(this._publicAddress);
 	}
 
-	public async sendPaymentTransaction(transactionParams: PaymentTransactionParams, 
+	async sendPaymentTransaction(transactionParams: PaymentTransactionParams, 
 		interceptor?: TransactionInterceptor): Promise<KinCommonSdk.TransactionId> {
 		return await this._txSender.sendTransaction(transactionParams, interceptor);
 	}
@@ -37,7 +37,19 @@ export class KinAccount {
 	/**
 	 * Check if the account exists on kin blockchain.
 	 */
-	public async isAccountExisting(): Promise<Boolean> {
+	async isAccountExisting(): Promise<Boolean> {
 		return await this._accountDataRetriever.isAccountExisting(this._publicAddress);
+	}
+
+	addPaymentListener(listener: EventListener<PaymentTransaction>) {
+
+	} 
+
+	addBalanceListener(listener: EventListener<Balance>) {
+
+	}
+
+	addAccountCreationListener(listener: EventListener<Void>) {
+
 	}
 }

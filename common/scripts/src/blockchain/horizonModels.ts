@@ -106,3 +106,5 @@ export interface DecodeTransactionParams {
 }
 
 export type OnPaymentListener = (payment: PaymentTransaction) => void;
+export type OnBalanceUpdatedListenmer = (balance: Number) => void;
+export type OnAccountCreatedListener = (publicAddress: Address) => void; 
