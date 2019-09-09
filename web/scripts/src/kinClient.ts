@@ -27,7 +27,7 @@ export class KinClient {
 	 * Get list of KinAccount
 	 * @returns array of KinAccount objects
 	 */
-	async getkinAccounts(): Promise<KinAccount[]> {
+	async getAccounts(): Promise<KinAccount[]> {
 		return new Promise(async resolve => {
 			const publicAddresses = await this.keystoreProvider.publicAddresses;
 			resolve(publicAddresses.map((address: KinCommonSdk.Address) => new KinAccount(address, this.keystoreProvider,

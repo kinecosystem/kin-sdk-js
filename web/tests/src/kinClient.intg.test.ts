@@ -11,7 +11,7 @@ let accounts: KinAccount[];
 describe("KinClient get KinAccounts ", async () => {
 	beforeAll(async () => {
 		client = new KinClient(Environment.Testnet, keystoreProvider);
-		accounts = await client.getkinAccounts();
+		accounts = await client.getAccounts();
 		expect(accounts.length).toBe(4)
 		for (let account of accounts){
 			expect(account.publicAddress).toBeDefined
@@ -62,7 +62,7 @@ describe("KinClient get KinAccounts ", async () => {
 
 
 	test("Test sendPaymentTransaction with interceptor, send envelope", async () => {
-		const accounts = await client.getkinAccounts();
+		const accounts = await client.getAccounts();
 
 		let TransactionInterceptorImpl = class implements TransactionInterceptor {
 			constructor() {
@@ -91,7 +91,7 @@ describe("KinClient get KinAccounts ", async () => {
 
 
 	test("Test sendPaymentTransaction with interceptor, send transaction", async () => {
-		const accounts = await client.getkinAccounts();
+		const accounts = await client.getAccounts();
 
 		let TransactionInterceptorImpl = class implements TransactionInterceptor {
 			constructor() {
@@ -117,5 +117,4 @@ describe("KinClient get KinAccounts ", async () => {
 		const balance = await accounts[3].getBalance();
 		expect(balance).toBe(10090);
 	}, 60000);
-
 });
