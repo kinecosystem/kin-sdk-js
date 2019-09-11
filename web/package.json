@@ -57,7 +57,7 @@
   },
   "dependencies": {
     "@kinecosystem/kin-sdk": "^0.20.8",
-    "@kinecosystem/kin-sdk-js-common": "^0.2.7",
+    "@kinecosystem/kin-sdk-js-common": "file:../common",
     "html-webpack-plugin": "^3.2.0"
   },
   "jest": {

@@ -1,37 +1,26 @@
 import {Server} from "@kinecosystem/kin-sdk";
-import {OnPaymentListener, PaymentListener, PaymentTransaction, Address} from "./horizonModels";
+import {EventListener, MultiAccountPaymentListener, PaymentTransaction, Address} from "./horizonModels";
 import {Utils} from "../utils";
 import {TransactionFactory} from "./transactionFactory"
 
-export class BlockchainListener {
-
-	constructor(private readonly _server: Server) {
-		this._server = _server;
-	}
-
-	createPaymentsListener(onPayment: OnPaymentListener, addresses: Address[]): PaymentListener {
-		return new MultiAccountsListener(this._server, onPayment, addresses);
-	}
-}
-
-class MultiAccountsListener implements PaymentListener {
+export class MultiPaymentsListener implements MultiAccountPaymentListener {
 
 	private readonly _addresses: Set<Address> = new Set<Address>();
-	private readonly _stream: any;
+	private readonly _streamClose: any;
 
-	constructor(server: Server, private readonly _onPayment: OnPaymentListener, addresses: Address[]) {
+	constructor(server: Server, private readonly _eventListener: EventListener<PaymentTransaction>, addresses: Address[]) {
 		if (addresses) {
 			for (const address of addresses) {
 				Utils.verifyValidAddressParam(address);
 				this._addresses.add(address);
 			}
 		}
-		this._stream = server.transactions().cursor('now').stream({
+		this._streamClose = server.transactions().cursor('now').stream({
 			onmessage: (txRecord: Server.TransactionRecord) => {
 				let payment = TransactionFactory.fromStellarTransaction(txRecord) as PaymentTransaction;
 				if (payment.amount && payment.destination &&
 					(this._addresses.has(payment.source) || this._addresses.has(payment.destination))) {
-					_onPayment(payment);
+					_eventListener.onDataUpdated(payment);
 				}
 			}
 		});
@@ -48,6 +37,6 @@ class MultiAccountsListener implements PaymentListener {
 	}
 
 	close() {
-		this._stream();
+		this._streamClose();
 	}
 }

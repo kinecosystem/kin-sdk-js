@@ -1,5 +1,6 @@
 import * as KinCommonSdk from "@kinecosystem/kin-sdk-js-common";
-import {Address, Balance, AccountData, PaymentTransactionParams, TransactionInterceptor, PaymentTransaction } from "@kinecosystem/kin-sdk-js-common";
+import {Address, Balance, AccountData, PaymentTransactionParams, TransactionInterceptor, PaymentTransaction, EventListener, MultiPaymentsListener } from "@kinecosystem/kin-sdk-js-common";
+import {EventRegistration, PaymentEventRegistration} from "./events"
 
 export class KinAccount {
 	private readonly _txSender: KinCommonSdk.TxSender;
@@ -7,10 +8,10 @@ export class KinAccount {
 	constructor(private readonly _publicAddress: KinCommonSdk.Address, 
 				keyStoreProvider: KinCommonSdk.KeystoreProvider,
 				private readonly _accountDataRetriever: KinCommonSdk.AccountDataRetriever, 
-				server: KinCommonSdk.Server, 
+				private readonly _server: KinCommonSdk.Server, 
 				environment: KinCommonSdk.Environment,
 		        private readonly _appId?: string) {
-		this._txSender = new KinCommonSdk.TxSender(_publicAddress, keyStoreProvider, server, environment, _appId);
+		this._txSender = new KinCommonSdk.TxSender(_publicAddress, keyStoreProvider, _server, environment, _appId);
 	}
 
 	get publicAddress(): Address {
@@ -41,15 +42,8 @@ export class KinAccount {
 		return await this._accountDataRetriever.isAccountExisting(this._publicAddress);
 	}
 
-	addPaymentListener(listener: EventListener<PaymentTransaction>) {
-
+	addPaymentListener(listener: EventListener<PaymentTransaction>): EventRegistration {
+		return new PaymentEventRegistration(this._server, listener, this._publicAddress);
 	} 
 
-	addBalanceListener(listener: EventListener<Balance>) {
-
-	}
-
-	addAccountCreationListener(listener: EventListener<Void>) {
-
-	}
 }

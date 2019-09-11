@@ -59,7 +59,7 @@ describe("Create TxSender ", async () => {
 			}
 			interceptTransactionSending(process: TransactionProcess): Promise<TransactionId> {
 				let promise: Promise<TransactionId> = new Promise(async resolve => {
-					resolve(await process.sendTransactionEnvelope(process.transaction().envelope))
+					resolve(await process.sendWhitelistTransaction(process.transaction().envelope))
 				})
 				return promise
 			}

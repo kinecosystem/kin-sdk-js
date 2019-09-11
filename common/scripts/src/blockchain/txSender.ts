@@ -38,7 +38,7 @@ export class TxSender {
 			return record.hash;
 		}
 
-		async sendTransactionEnvelope(transactionEnvelope: string): Promise<TransactionId> {
+		async sendWhitelistTransaction(transactionEnvelope: string): Promise<TransactionId> {
 			const record = await this._server.submitTransaction(new XdrTransaction(transactionEnvelope))
 			return record.hash;
 		}

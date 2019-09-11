@@ -1,4 +1,4 @@
-import { AccountData, Balance, Channel, Address, Transaction, PaymentTransaction, CreateAccountTransaction, RawTransaction, TransactionId } from "./blockchain/horizonModels";
+import { AccountData, Balance, Channel, Address, Transaction, PaymentTransaction, CreateAccountTransaction, RawTransaction, TransactionId, EventListener } from "./blockchain/horizonModels";
 import { TransactionParams, PaymentTransactionParams} from "./blockchain/transactionFactory"
 import { TransactionInterceptor, TransactionProcess} from "./blockchain/transactionInterceptor"
 import { Network, Server } from "@kinecosystem/kin-sdk";
@@ -11,6 +11,7 @@ import { Environment } from "./environment";
 import { KeystoreProvider } from "./blockchain/keystoreProvider";
 import { SimpleKeystoreProvider } from "./blockchain/simpleKeystoreProvider"
 import { KeyPair } from "./blockchain/keyPair";
+import { MultiPaymentsListener } from "./blockchain/blockchainListeners"
 import { Keypair as BaseKeyPair , Transaction as XdrTransaction} from "@kinecosystem/kin-sdk";
 import * as Config from "./config" 
 export {
@@ -41,5 +42,7 @@ BlockchainInfoRetriever,
 	PaymentTransaction, 
 	CreateAccountTransaction, 
 	RawTransaction,
-	Config
+	Config,
+	EventListener, 
+	MultiPaymentsListener
 };

@@ -1,6 +1,6 @@
 import {KinClient} from "../../scripts/src/kinClient";
 import {KinAccount} from "../../scripts/src/kinAccount"
-import {SimpleKeystoreProvider, PaymentTransactionParams, Environment, 
+import {SimpleKeystoreProvider, PaymentTransactionParams, Environment, EventListener, PaymentTransaction,
 	TransactionInterceptor, TransactionProcess, XdrTransaction, TransactionId, Transaction} from "@kinecosystem/kin-sdk-js-common"
 import { Account } from "@kinecosystem/kin-sdk";
 
@@ -69,7 +69,7 @@ describe("KinClient get KinAccounts ", async () => {
 			}
 			interceptTransactionSending(process: TransactionProcess): Promise<TransactionId> {
 				let promise: Promise<TransactionId> = new Promise(async resolve => {
-					resolve(await process.sendTransactionEnvelope(process.transaction().envelope))
+					resolve(await process.sendWhitelistTransaction(process.transaction().envelope))
 				})
 				return promise
 			}
@@ -103,7 +103,12 @@ describe("KinClient get KinAccounts ", async () => {
 				return promise
 			}
 		}
-		
+		let eventRegistration = accounts[3].addPaymentListener(<EventListener<PaymentTransaction>>{
+			onDataUpdated(tx: PaymentTransaction): void {
+				console.log("Received payment of: "+tx.amount+"Kin from "+tx.source+", destination: "+tx.destination);
+			}
+		})
+
 		for (let i = 0; i <= 2; i++) {
 			var sendBuilder = await accounts[i].sendPaymentTransaction(<PaymentTransactionParams> {
 				fee: 100,
@@ -116,5 +121,17 @@ describe("KinClient get KinAccounts ", async () => {
 		}
 		const balance = await accounts[3].getBalance();
 		expect(balance).toBe(10090);
+		eventRegistration.remove()
+
+		console.log("Event registration removed")
+		var sendBuilder = await accounts[0].sendPaymentTransaction(<PaymentTransactionParams> {
+			fee: 100,
+			memoText:"send5more",
+			address:accounts[3].publicAddress,
+			amount: 5
+		})
+		const payerBalance = await accounts[0].getBalance()
+		expect(payerBalance).toBe(9964.996)
+
 	}, 60000);
 });

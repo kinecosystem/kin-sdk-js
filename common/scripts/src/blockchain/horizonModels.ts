@@ -94,7 +94,7 @@ export interface RawTransaction extends TransactionBase {
 	operations: Operation[];
 }
 
-export interface PaymentListener {
+export interface MultiAccountPaymentListener {
 	addAddress: (address: Address) => void;
 	removeAddress: (address: Address) => void;
 	close: () => void;
@@ -105,6 +105,8 @@ export interface DecodeTransactionParams {
 	networkId: string;
 }
 
-export type OnPaymentListener = (payment: PaymentTransaction) => void;
-export type OnBalanceUpdatedListenmer = (balance: Number) => void;
-export type OnAccountCreatedListener = (publicAddress: Address) => void; 
+
+export interface EventListener<T> {
+	onDataUpdated(data: T): void
+}
+
