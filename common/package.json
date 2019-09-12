@@ -1,6 +1,6 @@
 {
   "name": "@kinecosystem/kin-sdk-js-common",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Kin sdk js common package for web and nodejs",
   "main": "scripts/bin/index.js",
   "types": "scripts/bin/index.d.ts",

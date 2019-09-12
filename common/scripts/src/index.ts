@@ -11,7 +11,7 @@ import { Environment } from "./environment";
 import { KeystoreProvider } from "./blockchain/keystoreProvider";
 import { SimpleKeystoreProvider } from "./blockchain/simpleKeystoreProvider"
 import { KeyPair } from "./blockchain/keyPair";
-import { MultiPaymentsListener } from "./blockchain/blockchainListeners"
+import { MultiPaymentsListener, AccountCreationListener } from "./blockchain/blockchainListeners"
 import { Keypair as BaseKeyPair , Transaction as XdrTransaction} from "@kinecosystem/kin-sdk";
 import * as Config from "./config" 
 export {
@@ -44,5 +44,6 @@ BlockchainInfoRetriever,
 	RawTransaction,
 	Config,
 	EventListener, 
-	MultiPaymentsListener
+	MultiPaymentsListener,
+	AccountCreationListener
 };

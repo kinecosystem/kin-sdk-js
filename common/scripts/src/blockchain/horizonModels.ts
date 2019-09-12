@@ -94,7 +94,7 @@ export interface RawTransaction extends TransactionBase {
 	operations: Operation[];
 }
 
-export interface MultiAccountPaymentListener {
+export interface PaymentListener {
 	addAddress: (address: Address) => void;
 	removeAddress: (address: Address) => void;
 	close: () => void;

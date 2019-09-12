@@ -1,6 +1,6 @@
 import * as KinCommonSdk from "@kinecosystem/kin-sdk-js-common";
-import {Address, Balance, AccountData, PaymentTransactionParams, TransactionInterceptor, PaymentTransaction, EventListener, MultiPaymentsListener } from "@kinecosystem/kin-sdk-js-common";
-import {EventRegistration, PaymentEventRegistration} from "./events"
+import {Address, Balance, AccountData, PaymentTransactionParams, TransactionInterceptor, CreateAccountTransaction, PaymentTransaction, EventListener, MultiPaymentsListener } from "@kinecosystem/kin-sdk-js-common";
+import {ListenerRegistration, PaymentListenerRegistration, CreateAcccountRegistration} from "./listenerRegistration"
 
 export class KinAccount {
 	private readonly _txSender: KinCommonSdk.TxSender;
@@ -42,8 +42,12 @@ export class KinAccount {
 		return await this._accountDataRetriever.isAccountExisting(this._publicAddress);
 	}
 
-	addPaymentListener(listener: EventListener<PaymentTransaction>): EventRegistration {
-		return new PaymentEventRegistration(this._server, listener, this._publicAddress);
+	addPaymentListener(listener: EventListener<PaymentTransaction>): ListenerRegistration {
+		return new PaymentListenerRegistration(this._server, listener, this._publicAddress);
 	} 
+
+	addAccountCreatedListener(listener: EventListener<void>): ListenerRegistration {
+		return new CreateAcccountRegistration(this._server, listener, this._publicAddress);
+	}
 
 }

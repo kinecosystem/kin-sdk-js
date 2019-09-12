@@ -1,7 +1,7 @@
 import {KinClient} from "../../scripts/src/kinClient";
 import {KinAccount} from "../../scripts/src/kinAccount"
 import {SimpleKeystoreProvider, PaymentTransactionParams, Environment, EventListener, PaymentTransaction,
-	TransactionInterceptor, TransactionProcess, XdrTransaction, TransactionId, Transaction} from "@kinecosystem/kin-sdk-js-common"
+	TransactionInterceptor, TransactionProcess, XdrTransaction, TransactionId, Transaction, CreateAccountTransaction} from "@kinecosystem/kin-sdk-js-common"
 import { Account } from "@kinecosystem/kin-sdk";
 
 const keystoreProvider = new SimpleKeystoreProvider(4);
@@ -18,8 +18,14 @@ describe("KinClient get KinAccounts ", async () => {
 			expect(await account.isAccountExisting()).toBe(false)
 		}
 	}, 30000);
-	test("Create accounts with friend bot and check balance", async() => {
+	test("Create accounts with friend bot and test account creation listener and get balance", async() => {
 		for (let account of accounts){
+			let eventRegistration = account.addAccountCreatedListener(<EventListener<void>>{
+				onDataUpdated(): void {
+					console.log("*** Created account!");
+					eventRegistration.remove()
+				}
+			})
 			let txId = await client.friendbot({ address: account.publicAddress, amount: 10000 });
 			expect(txId).toBeDefined()
 			expect(await account.isAccountExisting()).toBe(true)

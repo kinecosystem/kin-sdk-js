@@ -2,7 +2,7 @@ import { Environment, KeystoreProvider, KeyPair, BaseKeyPair, TransactionBuilder
 	     Address, Balance, AccountData, PaymentTransactionParams, TransactionParams, TransactionInterceptor } from "@kinecosystem/kin-sdk-js-common";
 import { KinClient } from "./kinClient"
 import { KinAccount } from "./kinAccount"
-import { EventRegistration } from "./events"
+import { ListenerRegistration } from "./listenerRegistration"
 export {
 	Environment,
 	KinClient,
@@ -13,5 +13,5 @@ export {
 	PaymentTransactionParams,
 	TransactionInterceptor, 
 	KinAccount,
-	EventRegistration
+	ListenerRegistration as EventRegistration
 };
