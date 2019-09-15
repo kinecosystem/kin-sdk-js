@@ -1,17 +1,29 @@
-import { Environment, KeystoreProvider, KeyPair, BaseKeyPair, TransactionBuilder, XdrTransaction, 
-	     Address, Balance, AccountData, PaymentTransactionParams, TransactionParams, TransactionInterceptor } from "@kinecosystem/kin-sdk-js-common";
-import { KinClient } from "./kinClient"
-import { KinAccount } from "./kinAccount"
-import { ListenerRegistration } from "./listenerRegistration"
+import {
+	Environment,
+	KeystoreProvider,
+	Address,
+	Balance,
+	AccountData,
+	PaymentTransactionParams,
+	TransactionInterceptor,
+	Network
+} from "@kinecosystem/kin-sdk-js-common";
+import { Keypair, Transaction } from "@kinecosystem/kin-sdk";
+import { KinClient } from "./kinClient";
+import { KinAccount } from "./kinAccount";
+import { ListenerRegistration } from "./listenerRegistration";
 export {
 	Environment,
 	KinClient,
 	KeystoreProvider,
 	Address,
 	Balance,
+	Network,
+	Keypair,
+	Transaction,
 	AccountData,
 	PaymentTransactionParams,
-	TransactionInterceptor, 
+	TransactionInterceptor,
 	KinAccount,
 	ListenerRegistration as EventRegistration
 };
