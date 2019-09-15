@@ -1,9 +1,9 @@
 {
   "name": "@kinecosystem/kin-sdk-js-web",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Kin SDK web javascript/typescript client",
-  "main": "bin/index.js",
-  "types": "bin/index.d.ts",
+  "main": "scripts/bin/index.js",
+  "types": "scripts/bin/index.d.ts",
   "scripts": {
     "clean": "rimraf scripts/bin tests/bin public",
     "transpile": "tsc -p scripts",
