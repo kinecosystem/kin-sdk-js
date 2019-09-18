@@ -1,6 +1,6 @@
 {
   "name": "@kinecosystem/kin-sdk-js-common",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Kin sdk js common package for web and nodejs",
   "main": "scripts/bin/index.js",
   "types": "scripts/bin/index.d.ts",
@@ -9,6 +9,10 @@
     "transpile": "tsc -p scripts",
     "lint": "./node_modules/.bin/tslint -p scripts",
     "build": "npm-run-all clean transpile",
+    "watch-web": "webpack --watch -d",
+    "build-web": "webpack -p",
+    "analyze": "webpack --profile --json > public/stats.json",
+    "bundle-build-graph": "webpack-bundle-analyzer public/stats.json",
     "transpile-tests": "tsc -p tests",
     "tests": "npm-run-all transpile transpile-tests jest",
     "unit-test": "npm-run-all transpile transpile-tests jest-unit",

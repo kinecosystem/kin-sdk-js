@@ -1,19 +1,30 @@
-import { AccountData, Balance, Channel, Address, Transaction, PaymentTransaction, CreateAccountTransaction, RawTransaction, TransactionId, EventListener } from "./blockchain/horizonModels";
-import { TransactionParams, PaymentTransactionParams} from "./blockchain/transactionFactory"
-import { TransactionInterceptor, TransactionProcess} from "./blockchain/transactionInterceptor"
+import {
+	AccountData,
+	Balance,
+	Channel,
+	Address,
+	Transaction,
+	PaymentTransaction,
+	CreateAccountTransaction,
+	RawTransaction,
+	TransactionId,
+	EventListener
+} from "./blockchain/horizonModels";
+import { TransactionParams, PaymentTransactionParams } from "./blockchain/transactionFactory";
+import { TransactionInterceptor, TransactionProcess } from "./blockchain/transactionInterceptor";
 import { Network, Server } from "@kinecosystem/kin-sdk";
 import { AccountDataRetriever } from "./blockchain/accountDataRetriever";
 import { TxSender } from "./blockchain/txSender";
 import { TransactionBuilder } from "./blockchain/transactionBuilder";
 import { IBlockchainInfoRetriever, BlockchainInfoRetriever } from "./blockchain/blockchainInfoRetriever";
-import { Friendbot } from "./friendbot"
+import { Friendbot } from "./friendbot";
 import { Environment } from "./environment";
 import { KeystoreProvider } from "./blockchain/keystoreProvider";
-import { SimpleKeystoreProvider } from "./blockchain/simpleKeystoreProvider"
+import { SimpleKeystoreProvider } from "./blockchain/simpleKeystoreProvider";
 import { KeyPair } from "./blockchain/keyPair";
-import { MultiPaymentsListener, AccountCreationListener } from "./blockchain/blockchainListeners"
-import { Keypair as BaseKeyPair , Transaction as XdrTransaction} from "@kinecosystem/kin-sdk";
-import * as Config from "./config" 
+import { MultiPaymentsListener, AccountCreationListener } from "./blockchain/blockchainListeners";
+import { Keypair as BaseKeyPair, Transaction as XdrTransaction } from "@kinecosystem/kin-sdk";
+import * as Config from "./config";
 export {
 	AccountData,
 	Balance,
@@ -26,7 +37,7 @@ export {
 	Channel,
 	TransactionBuilder,
 	IBlockchainInfoRetriever,
-BlockchainInfoRetriever,
+	BlockchainInfoRetriever,
 	Friendbot,
 	KeystoreProvider,
 	SimpleKeystoreProvider,
@@ -38,12 +49,12 @@ BlockchainInfoRetriever,
 	PaymentTransactionParams,
 	TransactionInterceptor,
 	TransactionProcess,
-	Transaction, 
-	PaymentTransaction, 
-	CreateAccountTransaction, 
+	Transaction,
+	PaymentTransaction,
+	CreateAccountTransaction,
 	RawTransaction,
 	Config,
-	EventListener, 
+	EventListener,
 	MultiPaymentsListener,
 	AccountCreationListener
 };
