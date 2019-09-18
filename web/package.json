@@ -1,6 +1,6 @@
 {
   "name": "@kinecosystem/kin-sdk-js-web",
-  "version": "0.0.5",
+  "version": "0.0.12",
   "description": "Kin SDK web javascript/typescript client",
   "main": "scripts/bin/index.js",
   "types": "scripts/bin/index.d.ts",
@@ -11,6 +11,8 @@
     "build": "npm-run-all clean transpile build-web",
     "watch-web": "webpack --watch -d",
     "build-web": "webpack -p",
+    "analyze": "webpack --profile --json > public/stats.json",
+    "bundle-build-graph": "webpack-bundle-analyzer public/stats.json",
     "transpile-tests": "tsc -p tests",
     "tests": "npm-run-all transpile transpile-tests jest",
     "unit-test": "npm-run-all transpile transpile-tests jest-unit",
@@ -53,6 +55,7 @@
     "tslint-eslint-rules": "^5.4.0",
     "typescript": "^3.6.2",
     "webpack": "^4.39.3",
+    "webpack-bundle-analyzer": "^3.5.0",
     "webpack-cli": "^3.3.7"
   },
   "dependencies": {
