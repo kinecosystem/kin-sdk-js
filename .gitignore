@@ -5,9 +5,12 @@ node_modules
 coverage
 .DS_Store
 public/
-src/bin
-tests/bin
-src/bin
+web/scripts/bin
+web/tests/bin
+common/scripts/bin
+common/tests/bin
 .DS_Store
 tests/src/*.js
 tests/src/*.js.map
+common/package-lock.json
+web/package-lock.json
