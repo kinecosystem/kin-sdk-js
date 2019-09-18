@@ -1,6 +1,6 @@
 {
   "name": "@kinecosystem/kin-sdk-js-web",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Kin SDK web javascript/typescript client",
   "main": "scripts/bin/index.js",
   "types": "scripts/bin/index.d.ts",
